@@ -174,7 +174,7 @@ class FirebaseAuthClient {
       '$firebaseAuthBaseUrl:${FirebaseAuthAPIMethods.signInAnonymously}?key=$apiKey';
 
   static loginAnonymouslyHandler(Request request) async {
-    log("Request: ${request.url}");
+    print("Requested: ${request.url}");
 
     final http.Response result = await http.post(
       Uri.parse(signInAnonymouslyUrl),
@@ -211,8 +211,6 @@ class FirebaseAuthClient {
       );
     }
 
-    log("Response: ${response.statusCode}");
-
     return response;
   }
 
@@ -225,7 +223,7 @@ class FirebaseAuthClient {
   ///   "email": "string"
   /// }
   static loginWithEmailAndPasswordHandler(Request request) async {
-    log("Request: ${request.url}");
+    print("Requested: ${request.url}");
 
     var authorization = request.headers['authorization'];
     if (authorization == null) {
@@ -286,8 +284,6 @@ class FirebaseAuthClient {
         body: result.body,
       );
     }
-
-    log("Response: ${response.statusCode}");
 
     return response;
   }

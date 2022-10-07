@@ -1,16 +1,14 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
-import 'package:cloud_run_google_apis/helpers.dart';
 import 'package:googleapis/firestore/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
+import 'package:sample_auth_server/helpers.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 /// See:
 /// https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password
 
 Future main() async {
-  // await Future.delayed(Duration(hours: 1));
-
   final projectId = await currentProjectId();
   print('Current GCP project id: $projectId');
 

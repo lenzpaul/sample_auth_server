@@ -1,4 +1,4 @@
-name: cloud_run_google_apis
+name: sample_auth_server
 publish_to: none # not intended for publication to pub.dev
 
 environment:
