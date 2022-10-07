@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
+import 'package:dotenv/dotenv.dart';
 
 /// Serves [handler] on [InternetAddress.anyIPv4] using the port returned by
 /// [listenPort].
@@ -88,10 +89,15 @@ Future<void> terminateRequestFuture() {
 /// [Project metadata](https://cloud.google.com/compute/docs/metadata/default-metadata-values#project_metadata)
 /// is queried for the Project ID.
 Future<String> currentProjectId() async {
+  var env = DotEnv(includePlatformEnvironment: true)..load();
+
   for (var envKey in gcpProjectIdEnvironmentVariables) {
-    final value = Platform.environment[envKey];
+    // final value = Platform.environment[envKey];
+    final value = env[envKey];
     if (value != null) return value;
   }
+
+  // Check vscode environment variables
 
   const host = 'http://metadata.google.internal/';
   final url = Uri.parse('$host/computeMetadata/v1/project/project-id');
