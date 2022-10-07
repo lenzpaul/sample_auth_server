@@ -1,12 +1,10 @@
-// Copyright (c) 2021, the Dart project authors. Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cloud_run_google_apis/helpers.dart';
+import 'package:dotenv/dotenv.dart';
 import 'package:googleapis/firestore/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart' as http;
@@ -23,14 +21,25 @@ class FirebaseAuthAPIMethods {
 class FirebaseAuthClient {
   FirebaseAuthClient._();
 
-// FIXME: Move to environment variable
-  static const _apiKey = 'AIzaSyAcSBrLIJO4dP_KX6ojNvYvvH17s-BjVXY';
+  static String get apiKey {
+    var env = DotEnv(includePlatformEnvironment: true)..load();
+
+    if (env['FIREBASE_API_KEY'] == null) {
+      throw Exception(
+        'FIREBASE_API_KEY is not set. '
+        'Please set it in your .env file at the root of your project.\n'
+        'e.g.: FIREBASE_API_KEY="APIKEYHERE"',
+      );
+    }
+
+    return env['FIREBASE_API_KEY']!;
+  }
 
   static const firebaseAuthBaseUrl =
       'https://identitytoolkit.googleapis.com/v1/accounts';
 
-  static const signInWithPasswordUrl =
-      '$firebaseAuthBaseUrl:${FirebaseAuthAPIMethods.signInWithPassword}?key=$_apiKey';
+  static String get signInWithPasswordUrl =>
+      '$firebaseAuthBaseUrl:${FirebaseAuthAPIMethods.signInWithPassword}?key=$apiKey';
 
   /// Expects a [Request] with authorization header as follows:
   /// {authorization: 'Basic <base64 encoded email:password>'}
@@ -41,6 +50,8 @@ class FirebaseAuthClient {
   ///   "email": "string"
   /// }
   static loginHandler(Request request) async {
+    log("Request: ${request.url}");
+
     var authorization = request.headers['authorization'];
     if (authorization == null) {
       return Response(401, body: 'Unauthorized. Missing authorization header.');
@@ -77,12 +88,13 @@ class FirebaseAuthClient {
     );
 
     // Return the uid and the email of the firebase user.
+    var response;
     if (result.statusCode == 200) {
       var body = jsonDecode(result.body);
       var email = body['email'];
       var uid = body['localId'];
 
-      return Response.ok(
+      response = Response.ok(
         JsonUtf8Encoder(' ').convert(
           {
             'email': email,
@@ -94,11 +106,15 @@ class FirebaseAuthClient {
         },
       );
     } else {
-      return Response(
+      response = Response(
         result.statusCode,
         body: result.body,
       );
     }
+
+    log("Response: ${response.statusCode}");
+
+    return response;
   }
 }
 
