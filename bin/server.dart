@@ -14,12 +14,15 @@ import 'package:shelf_router/shelf_router.dart';
 class FirebaseAuthAPIMethods {
   FirebaseAuthAPIMethods._();
   static const signInWithPassword = 'signInWithPassword';
+  static const signInAnonymously = 'signUp';
 }
 
 /// See:
 /// https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password
 class FirebaseAuthClient {
   FirebaseAuthClient._();
+// curl 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=[API_KEY]' \
+// -H 'Content-Type: application/json' --data-binary '{"returnSecureToken":true}'
 
   static String get apiKey {
     var env = DotEnv(includePlatformEnvironment: true)..load();
@@ -41,6 +44,52 @@ class FirebaseAuthClient {
   static String get signInWithPasswordUrl =>
       '$firebaseAuthBaseUrl:${FirebaseAuthAPIMethods.signInWithPassword}?key=$apiKey';
 
+  static String get signInAnonymouslyUrl =>
+      '$firebaseAuthBaseUrl:${FirebaseAuthAPIMethods.signInAnonymously}?key=$apiKey';
+
+  static loginAnonymouslyHandler(Request request) async {
+    log("Request: ${request.url}");
+
+    final http.Response result = await http.post(
+      Uri.parse(signInAnonymouslyUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'returnSecureToken': true,
+      }),
+    );
+
+    Response response;
+
+    if (result.statusCode == 200) {
+      var body = jsonDecode(result.body);
+      var email = body['email']; // Empty string
+      var uid = body['localId'];
+
+      response = Response.ok(
+        JsonUtf8Encoder(' ').convert(
+          {
+            'email': email,
+            'uid': uid,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+        },
+      );
+    } else {
+      response = Response(
+        result.statusCode,
+        body: result.body,
+      );
+    }
+
+    log("Response: ${response.statusCode}");
+
+    return response;
+  }
+
   /// Expects a [Request] with authorization header as follows:
   /// {authorization: 'Basic <base64 encoded email:password>'}
   ///
@@ -49,7 +98,7 @@ class FirebaseAuthClient {
   ///   "uid": "string",
   ///   "email": "string"
   /// }
-  static loginHandler(Request request) async {
+  static loginWithEmailAndPasswordHandler(Request request) async {
     log("Request: ${request.url}");
 
     var authorization = request.headers['authorization'];
@@ -80,7 +129,7 @@ class FirebaseAuthClient {
     var password = decodedString.split(':')[1];
 
     final result = await http.post(
-      Uri.parse(FirebaseAuthClient.signInWithPasswordUrl),
+      Uri.parse(signInWithPasswordUrl),
       body: {
         'email': email,
         'password': password,
@@ -119,6 +168,8 @@ class FirebaseAuthClient {
 }
 
 Future main() async {
+  // await Future.delayed(Duration(hours: 1));
+
   final projectId = await currentProjectId();
   print('Current GCP project id: $projectId');
 
@@ -136,7 +187,8 @@ Future main() async {
 
 Router _initRouter() {
   final router = Router();
-  router.get('/login', FirebaseAuthClient.loginHandler);
+  router.get('/login', FirebaseAuthClient.loginWithEmailAndPasswordHandler);
+  router.get('/loginAnonymously', FirebaseAuthClient.loginAnonymouslyHandler);
   // router.get('/logout', _firebaseLogoutHandler);
 
   return router;
