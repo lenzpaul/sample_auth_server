@@ -147,6 +147,9 @@ const gcpProjectIdEnvironmentVariables = {
 /// the `.env` file if it exists. This is useful for local development and
 /// debugging in VS Code, for example.
 String? getEnvVar(String key, {useDotEnv = false}) {
+  // DEBUG: Uncomment to debug using VS Code
+  // useDotEnv = isInDebugMode;
+
   if (useDotEnv) {
     var env = DotEnv(includePlatformEnvironment: true)..load();
     return env[key];
