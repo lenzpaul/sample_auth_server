@@ -5,6 +5,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
@@ -33,7 +34,7 @@ Future<void> serveHandler(Handler handler) async {
 /// `8080`.
 ///
 /// See https://cloud.google.com/run/docs/reference/container-contract#port
-int listenPort() => int.parse(Platform.environment['PORT'] ?? '8080');
+int listenPort() => int.parse(getEnvVar('PORT') ?? '8080');
 
 /// Returns a [Future] that completes when the process receives a
 /// [ProcessSignal] requesting a shutdown.
@@ -89,7 +90,8 @@ Future<void> terminateRequestFuture() {
 /// is queried for the Project ID.
 Future<String> currentProjectId() async {
   for (var envKey in gcpProjectIdEnvironmentVariables) {
-    final value = Platform.environment[envKey];
+    // final value = Platform.environment[envKey];
+    final value = getEnvVar(envKey);
     if (value != null) return value;
   }
   const host = 'http://metadata.google.internal/';
@@ -138,3 +140,69 @@ const gcpProjectIdEnvironmentVariables = {
   'CLOUDSDK_CORE_PROJECT',
   'GOOGLE_CLOUD_PROJECT',
 };
+
+/// Returns the value of the environment variable with the given [key].
+///
+/// If [useDotEnv] is `true`, we use the `dotenv` package to load the value from
+/// the `.env` file if it exists. This is useful for local development and
+/// debugging in VS Code, for example.
+String? getEnvVar(String key, {useDotEnv = false}) {
+  if (useDotEnv) {
+    var env = DotEnv(includePlatformEnvironment: true)..load();
+    return env[key];
+  }
+
+  return Platform.environment[key];
+
+  // return Platform.environment[key];
+}
+
+/// Checks if Dart is running in debug mode. Useful for debugging in VS Code,
+/// for example.
+///
+/// Evaluates to `true` if running in debug mode in VS Code.
+///
+/// Evaluates to `false` in *most* other cases.
+///
+/// * VS Code `debug`: `true`
+/// * VS Code `run`: `false`
+/// * `dart run`: `false`
+/// * `dart run --no-enable-asserts`: `false`
+/// * `dart run --enable-asserts`: `true`
+/// * `dart compile exe`: `false`
+bool get isInDebugMode {
+  // Assume we're in production mode
+  bool _inDebugMode = false;
+
+  // Assert expressions are only evaluated during development. They are ignored
+  // in production. Therefore, this code will only turn `inDebugMode` to true
+  // in our development environments!
+  assert(_inDebugMode = true);
+
+  // if (_inDebugMode) {
+  //   print('isInDebugMode: Running in debug mode');
+  // } else {
+  //   print('isInDebugMode: Running in release mode');
+  // }
+
+  return _inDebugMode;
+}
+
+/// Checks if Dart is running in debug mode. Similar to [isInDebugMode].
+///
+/// * VS Code `debug`: `true`
+/// * VS Code `run`: `true`
+/// * `dart run`: `true`
+/// * `dart run --no-enable-asserts`: `true`
+/// * `dart run --enable-asserts`: `true`
+/// * `dart compile exe`: `false`
+bool get runningInDebugMode {
+  bool _isReleaseMode = bool.fromEnvironment('dart.vm.product');
+  // // Check if dart is running in debug mode
+  // if (_isReleaseMode) {
+  //   print('runningInDebugMode: Running in release mode');
+  // } else {
+  //   print('runningInDebugMode: Running in debug mode');
+  // }
+  return !_isReleaseMode;
+}

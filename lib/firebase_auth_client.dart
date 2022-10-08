@@ -1,9 +1,10 @@
-// ignore_for_file: unnecessary_this
+// ignore_for_file: unnecessary_this, no_leading_underscores_for_local_identifiers
 
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:sample_auth_server/helpers.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
@@ -48,9 +49,11 @@ class FirebaseAuthClient {
 
   /// Get the API key from the environment.
   static String get apiKey {
-    final env = Platform.environment;
+    // final env = Platform.environment;
 
-    if (env['FIREBASE_API_KEY'] == null) {
+    var _apiKey = getEnvVar("FIREBASE_API_KEY");
+
+    if (_apiKey == null) {
       throw Exception(
         'FIREBASE_API_KEY is not set. '
         'Please set it in your .env file at the root of your project.\n'
@@ -58,7 +61,7 @@ class FirebaseAuthClient {
       );
     }
 
-    return env['FIREBASE_API_KEY']!;
+    return _apiKey;
   }
 
   /// The base URL for the Firebase Auth REST API.
