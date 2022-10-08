@@ -15,7 +15,8 @@ Future main() async {
   );
 
   try {
-    await serveHandler(FirebaseAuthClient().router);
+    // await serveHandler(FirebaseAuthClient().router);
+    await serveHandler(FirebaseAuthClient().routerWithLogging);
   } finally {
     authClient.close();
   }

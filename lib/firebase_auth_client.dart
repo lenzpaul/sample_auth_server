@@ -1,11 +1,11 @@
 // ignore_for_file: unnecessary_this
 
-import 'package:shelf_router/shelf_router.dart';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:shelf/shelf.dart';
+import 'package:shelf_router/shelf_router.dart';
 
 /// Name of the method to call on the [FirebaseAuthClient] class.
 ///
@@ -34,11 +34,14 @@ class FirebaseAuthClient {
   late Router _router;
 
   /// A [Router] that handles requests to the Firebase Auth REST API.
-  Router get router => _router;
+  Handler get router => _router;
+
+  /// Same as [router], but with logging.
+  Handler get routerWithLogging => logRequests().addHandler(router);
 
   /// Initializes the router and adds the request handlers.
   void _setupRouter() {
-    this._router = Router()
+    this._router = (Router())
       ..get('/login', FirebaseAuthClient.loginWithEmailAndPasswordHandler)
       ..get('/loginAnonymously', FirebaseAuthClient.loginAnonymouslyHandler);
   }
@@ -74,8 +77,6 @@ class FirebaseAuthClient {
   ///
   /// Does not require any headers or body.
   static Future<Response> loginAnonymouslyHandler(Request request) async {
-    print("Requested: ${request.url}");
-
     final http.Response result = await http.post(
       Uri.parse(signInAnonymouslyUrl),
       headers: {
@@ -123,9 +124,9 @@ class FirebaseAuthClient {
   ///   "email": "string"
   /// }
   static Future<Response> loginWithEmailAndPasswordHandler(
-      Request request) async {
-    print("Requested: ${request.url}");
-
+      Request request) async
+  //
+  {
     var authorization = request.headers['authorization'];
     if (authorization == null) {
       return Response(401, body: 'Unauthorized. Missing authorization header.');
@@ -161,31 +162,31 @@ class FirebaseAuthClient {
       },
     );
 
-    // Return the uid and the email of the firebase user.
-    var response;
-    if (result.statusCode == 200) {
-      var body = jsonDecode(result.body);
-      var email = body['email'];
-      var uid = body['localId'];
-
-      response = Response.ok(
-        JsonUtf8Encoder(' ').convert(
-          {
-            'email': email,
-            'uid': uid,
-          },
-        ),
-        headers: {
-          'content-type': 'application/json',
-        },
-      );
-    } else {
-      response = Response(
+    // Authentication not successful.
+    if (result.statusCode != 200) {
+      return Response(
         result.statusCode,
         body: result.body,
+        headers: result.headers,
       );
     }
 
-    return response;
+    // Authentication successful. Return the uid and the email of the firebase
+    // user.
+    var body = jsonDecode(result.body);
+    email = body['email'];
+    var uid = body['localId'];
+
+    return Response.ok(
+      JsonUtf8Encoder(' ').convert(
+        {
+          'email': email,
+          'uid': uid,
+        },
+      ),
+      headers: {
+        'content-type': 'application/json',
+      },
+    );
   }
 }
