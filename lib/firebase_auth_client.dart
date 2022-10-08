@@ -102,6 +102,7 @@ class FirebaseAuthClient {
           {
             'email': email,
             'uid': uid,
+            'isGuest': true,
           },
         ),
         headers: {
