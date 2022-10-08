@@ -167,11 +167,11 @@ class FirebaseAuthClient {
 
     // Authentication not successful.
     if (result.statusCode != 200) {
-      return Response(
+      var res = Response(
         result.statusCode,
         body: result.body,
-        headers: result.headers,
       );
+      return res;
     }
 
     // Authentication successful. Return the uid and the email of the firebase
