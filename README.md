@@ -41,6 +41,9 @@ First set the following environment variables:
 - `GCP_PROJECT` - the project ID
 - `FIREBASE_API_KEY` - the API key for the Firebase project (see [here](https://firebase.google.com/docs/projects/api-keys)
 
+> Note: For convenience, you can use [this script](set_env.sh) to set the environment variables from a file. See sample env file [here](.env_example).
+
+
 Then run the following commands:
 - `dart pub get`
 - `dart run bin/server.dart`
