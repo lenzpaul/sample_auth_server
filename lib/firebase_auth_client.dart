@@ -73,7 +73,7 @@ class FirebaseAuthClient {
   /// Handles requests to the Firebase Auth REST API for signing in anonymously.
   ///
   /// Does not require any headers or body.
-  static loginAnonymouslyHandler(Request request) async {
+  static Future<Response> loginAnonymouslyHandler(Request request) async {
     print("Requested: ${request.url}");
 
     final http.Response result = await http.post(
@@ -122,7 +122,8 @@ class FirebaseAuthClient {
   ///   "uid": "string",
   ///   "email": "string"
   /// }
-  static loginWithEmailAndPasswordHandler(Request request) async {
+  static Future<Response> loginWithEmailAndPasswordHandler(
+      Request request) async {
     print("Requested: ${request.url}");
 
     var authorization = request.headers['authorization'];
