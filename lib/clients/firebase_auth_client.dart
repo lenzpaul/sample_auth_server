@@ -1,12 +1,11 @@
 // ignore_for_file: unnecessary_this, no_leading_underscores_for_local_identifiers
 
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:http/http.dart' as http;
 import 'package:sample_auth_server/helpers.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:sample_auth_server/models/models.dart';
 
 /// Name of the method to call on the [FirebaseAuthClient] class.
 ///

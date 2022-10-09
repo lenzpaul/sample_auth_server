@@ -1,6 +1,6 @@
 import 'package:googleapis/firestore/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
-import 'package:sample_auth_server/firebase_auth_client.dart';
+import 'package:sample_auth_server/clients/firebase_auth_client.dart';
 import 'package:sample_auth_server/helpers.dart';
 
 /// See:

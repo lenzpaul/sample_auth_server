@@ -4,6 +4,7 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -209,3 +210,12 @@ bool get runningInDebugMode {
   // }
   return !_isReleaseMode;
 }
+
+/// Encode the [object] as multiline JSON with 2 space indentation.
+String prettyJsonEncode(Object? object) =>
+    JsonEncoder.withIndent(' ').convert(object).trim();
+
+/// 'content-type': 'application/json',
+Map<String, Object> get jsonContentTypeHeader => {
+      HttpHeaders.contentTypeHeader: ContentType.json,
+    };
