@@ -93,26 +93,15 @@ class FirebaseAuthClient {
 
     if (result.statusCode == 200) {
       var body = jsonDecode(result.body);
-      var email = body['email']; // Empty string
-      var uid = body['localId'];
+      var user = AuthUser(
+        uid: body['localId'],
+        isGuest: true, // Logged in anonymously
+      );
 
-      response = Response.ok(
-        JsonUtf8Encoder(' ').convert(
-          {
-            'email': email,
-            'uid': uid,
-            'isGuest': true,
-          },
-        ),
-        headers: {
-          'content-type': 'application/json',
-        },
-      );
+      response = AuthResponse.loginSuccesful(user);
     } else {
-      response = Response(
-        result.statusCode,
-        body: result.body,
-      );
+      // An error occurred.
+      response = AuthResponse.fromFirebaseAuthErrorResponseBody(result.body);
     }
 
     return response;
@@ -132,21 +121,21 @@ class FirebaseAuthClient {
   {
     var authorization = request.headers['authorization'];
     if (authorization == null) {
-      return Response(401, body: 'Unauthorized. Missing authorization header.');
+      return AuthResponse.badRequest('Authorization header is missing');
     }
 
     // Check authorization header for the type of authentication. Only support
     // Firebase authentication for now with Basic Auth base64 encoded.
     var authType = authorization.split(' ')[0];
+
+    // Unsupported authentication type provided.
     if (authType != 'Basic') {
-      return Response(
-        401,
-        body: 'Invalid authorization type. '
-            'Only Basic is supported at this time.',
+      return AuthResponse.badRequest(
+        'Unsupported authentication type. Only Basic Auth is supported.',
       );
     }
 
-    // If the authorization type is Basic, then decode the base64 encoded
+    // The authorization type is Basic. Decode the base64 encoded
     // credentials and send to Firebase for authentication.
     //
     // The encoded credentials are expected to be in the format of
@@ -167,12 +156,7 @@ class FirebaseAuthClient {
 
     // Authentication not successful.
     if (result.statusCode != 200) {
-      return AuthResponse.fromFirebaseError(result.body);
-      // var res = Response(
-      //   result.statusCode,
-      //   body: result.body,
-      // );
-      // return res;
+      return AuthResponse.fromFirebaseAuthErrorResponseBody(result.body);
     }
 
     // Authentication successful.

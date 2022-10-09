@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_this
+
 import 'dart:convert';
 
 import 'package:sample_auth_server/helpers.dart';

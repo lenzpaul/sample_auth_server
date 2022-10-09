@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:sample_auth_server/helpers.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
+import 'package:sample_auth_server/models/bad_request.dart';
 import 'package:sample_auth_server/models/successful_login.dart';
 import 'package:sample_auth_server/models/unsuccesful_login.dart';
 import 'package:shelf/shelf.dart' as shelf;
@@ -33,9 +34,23 @@ class AuthResponse extends shelf.Response {
           headers: jsonContentTypeHeader,
         );
 
-  AuthResponse.fromFirebaseError(Object firebaseError)
+  /// Fail the login with a 401 status code and details about the error
+  /// extracted from the [firebaseErrorResponseBody].
+  AuthResponse.fromFirebaseAuthErrorResponseBody(
+      Object firebaseErrorResponseBody)
       : super.unauthorized(
-          UnsuccessfulLogin.fromFirebaseError(firebaseError).toJson(),
+          UnsuccessfulLogin.fromFirebaseError(firebaseErrorResponseBody)
+              .toJson(),
+          encoding: utf8,
+          headers: jsonContentTypeHeader,
+        );
+
+  /// Bad request, with a 400 status code and details about the error if any.
+  AuthResponse.badRequest([String? errorDescription])
+      : super.badRequest(
+          body: BadRequestResponseBody(
+            errorDescription: errorDescription,
+          ).toJson(),
           encoding: utf8,
           headers: jsonContentTypeHeader,
         );
