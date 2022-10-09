@@ -65,4 +65,29 @@ class UnsuccessfulLogin extends AuthResponseBody {
 
   @override
   int get hashCode => errorDescription.hashCode;
+
+  /// The response body for a failed login.
+  ///
+  /// Here we provide details about the error (e.g. invalid email or password).
+  ///
+  /// Sample Firebase Error Response:
+  /// ```json
+  /// {
+  ///     "error": {
+  ///         "code": 400,
+  ///         "message": "INVALID_PASSWORD",
+  ///         "errors": [
+  ///             {
+  ///                 "message": "INVALID_PASSWORD",
+  ///                 "domain": "global",
+  ///                 "reason": "invalid"
+  ///             }
+  ///         ]
+  ///     }
+  /// }
+  /// ```
+  factory UnsuccessfulLogin.fromFirebaseError(Object firebaseError) {
+    var msg = json.decode(firebaseError.toString())['error']['message'];
+    return UnsuccessfulLogin(errorDescription: msg);
+  }
 }

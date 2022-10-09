@@ -167,30 +167,24 @@ class FirebaseAuthClient {
 
     // Authentication not successful.
     if (result.statusCode != 200) {
-      var res = Response(
-        result.statusCode,
-        body: result.body,
-      );
-      return res;
+      return AuthResponse.fromFirebaseError(result.body);
+      // var res = Response(
+      //   result.statusCode,
+      //   body: result.body,
+      // );
+      // return res;
     }
 
     // Authentication successful.
     //
     // Return the uid and the email of the firebase user.
-    var body = jsonDecode(result.body);
-    email = body['email'];
-    var uid = body['localId'];
+    final Map<String, dynamic> body = jsonDecode(result.body);
 
-    return Response.ok(
-      JsonUtf8Encoder(' ').convert(
-        {
-          'email': email,
-          'uid': uid,
-        },
-      ),
-      headers: {
-        'content-type': 'application/json',
-      },
+    var user = AuthUser(
+      email: body['email'],
+      uid: body['localId'],
     );
+
+    return AuthResponse.loginSuccesful(user);
   }
 }

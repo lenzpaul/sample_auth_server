@@ -32,4 +32,11 @@ class AuthResponse extends shelf.Response {
           encoding: utf8,
           headers: jsonContentTypeHeader,
         );
+
+  AuthResponse.fromFirebaseError(Object firebaseError)
+      : super.unauthorized(
+          UnsuccessfulLogin.fromFirebaseError(firebaseError).toJson(),
+          encoding: utf8,
+          headers: jsonContentTypeHeader,
+        );
 }

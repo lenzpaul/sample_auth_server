@@ -216,6 +216,6 @@ String prettyJsonEncode(Object? object) =>
     JsonEncoder.withIndent(' ').convert(object).trim();
 
 /// 'content-type': 'application/json',
-Map<String, Object> get jsonContentTypeHeader => {
-      HttpHeaders.contentTypeHeader: ContentType.json,
+Map<String, String> get jsonContentTypeHeader => {
+      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
     };
