@@ -148,7 +148,7 @@ const gcpProjectIdEnvironmentVariables = {
 /// debugging in VS Code, for example.
 String? getEnvVar(String key, {useDotEnv = false}) {
   // DEBUG: Uncomment to debug using VS Code
-  // useDotEnv = isInDebugMode;
+  useDotEnv = isInDebugMode;
 
   if (useDotEnv) {
     var env = DotEnv(includePlatformEnvironment: true)..load();

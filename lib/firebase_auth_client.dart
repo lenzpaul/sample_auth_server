@@ -175,8 +175,9 @@ class FirebaseAuthClient {
       return res;
     }
 
-    // Authentication successful. Return the uid and the email of the firebase
-    // user.
+    // Authentication successful.
+    //
+    // Return the uid and the email of the firebase user.
     var body = jsonDecode(result.body);
     email = body['email'];
     var uid = body['localId'];
