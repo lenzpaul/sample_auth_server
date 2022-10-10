@@ -1,19 +1,22 @@
 // ignore_for_file: unnecessary_this, no_leading_underscores_for_local_identifiers
 
-import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf_router/shelf_router.dart' as shelf_router;
 import 'package:sample_auth_server/helpers.dart';
-import 'package:shelf/shelf.dart';
-import 'package:shelf_router/shelf_router.dart';
+import 'dart:convert';
 import 'package:sample_auth_server/models/models.dart';
+import 'package:googleapis/firestore/v1.dart';
+import 'package:googleapis_auth/auth_io.dart';
 
 /// Name of the method to call on the [FirebaseAuthClient] class.
 ///
 /// These map the Firebase Auth REST API methods.
 class FirebaseAuthAPIMethods {
   FirebaseAuthAPIMethods._();
-  static const signInWithPassword = 'signInWithPassword';
+
   static const signInAnonymously = 'signUp';
+  static const signInWithPassword = 'signInWithPassword';
 }
 
 /// {@template firebase_auth_client}
@@ -23,27 +26,36 @@ class FirebaseAuthAPIMethods {
 /// env.
 /// {@endtemplate}
 class FirebaseAuthClient {
+  /// {@macro firebase_auth_client}
+  factory FirebaseAuthClient() => instance; // Singleton
+
   FirebaseAuthClient._() {
     _setupRouter();
   }
 
-  /// {@macro firebase_auth_client}
-  factory FirebaseAuthClient() => _instance; // Singleton
+  /// The base URL for the Firebase Auth REST API.
+  static const firebaseAuthBaseUrl =
+      'https://identitytoolkit.googleapis.com/v1/accounts';
 
-  static final _instance = FirebaseAuthClient._();
-  late Router _router;
+  static final instance = FirebaseAuthClient._();
+
+  late http.Client _authenticatedClient;
+  late final String _projectId;
+  late shelf_router.Router _router;
 
   /// A [Router] that handles requests to the Firebase Auth REST API.
-  Handler get router => _router;
+  shelf_router.Router get router => _router;
 
   /// Same as [router], but with logging.
-  Handler get routerWithLogging => logRequests().addHandler(router);
+  shelf.Handler get routerWithLogging => shelf.logRequests().addHandler(router);
 
-  /// Initializes the router and adds the request handlers.
-  void _setupRouter() {
-    this._router = (Router())
-      ..get('/login', FirebaseAuthClient.loginWithEmailAndPasswordHandler)
-      ..get('/loginAnonymously', FirebaseAuthClient.loginAnonymouslyHandler);
+  Future<void> initClient() async {
+    _projectId = await currentProjectId();
+    print('Current GCP project id: $_projectId');
+
+    _authenticatedClient = await clientViaApplicationDefaultCredentials(
+      scopes: [FirestoreApi.datastoreScope],
+    );
   }
 
   /// Get the API key from the environment.
@@ -63,10 +75,6 @@ class FirebaseAuthClient {
     return _apiKey;
   }
 
-  /// The base URL for the Firebase Auth REST API.
-  static const firebaseAuthBaseUrl =
-      'https://identitytoolkit.googleapis.com/v1/accounts';
-
   /// Appends the sign in with password method to the base URL.
   static String get signInWithPasswordUrl =>
       '$firebaseAuthBaseUrl:${FirebaseAuthAPIMethods.signInWithPassword}?key=$apiKey';
@@ -78,7 +86,8 @@ class FirebaseAuthClient {
   /// Handles requests to the Firebase Auth REST API for signing in anonymously.
   ///
   /// Does not require any headers or body.
-  static Future<Response> loginAnonymouslyHandler(Request request) async {
+  static Future<shelf.Response> loginAnonymouslyHandler(
+      shelf.Request request) async {
     final http.Response result = await http.post(
       Uri.parse(signInAnonymouslyUrl),
       headers: {
@@ -89,7 +98,7 @@ class FirebaseAuthClient {
       }),
     );
 
-    Response response;
+    shelf.Response response;
 
     if (result.statusCode == 200) {
       var body = jsonDecode(result.body);
@@ -115,8 +124,8 @@ class FirebaseAuthClient {
   ///   "uid": "string",
   ///   "email": "string"
   /// }
-  static Future<Response> loginWithEmailAndPasswordHandler(
-      Request request) async
+  static Future<shelf.Response> loginWithEmailAndPasswordHandler(
+      shelf.Request request) async
   //
   {
     var authorization = request.headers['authorization'];
@@ -170,5 +179,12 @@ class FirebaseAuthClient {
     );
 
     return AuthResponse.loginSuccesful(user);
+  }
+
+  /// Initializes the router and adds the request handlers.
+  void _setupRouter() {
+    this._router = (shelf_router.Router())
+      ..get('/login', FirebaseAuthClient.loginWithEmailAndPasswordHandler)
+      ..get('/loginAnonymously', FirebaseAuthClient.loginAnonymouslyHandler);
   }
 }

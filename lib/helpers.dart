@@ -8,18 +8,18 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:shelf/shelf.dart';
-import 'package:shelf/shelf_io.dart';
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf/shelf_io.dart' as shelf_io;
 
 /// Serves [handler] on [InternetAddress.anyIPv4] using the port returned by
 /// [listenPort].
 ///
 /// The returned [Future] will complete using [terminateRequestFuture] after
 /// closing the server.
-Future<void> serveHandler(Handler handler) async {
+Future<void> serveHandler(shelf.Handler handler) async {
   final port = listenPort();
 
-  final server = await serve(
+  final server = await shelf_io.serve(
     handler,
     InternetAddress.anyIPv4, // Allows external connections
     port,
