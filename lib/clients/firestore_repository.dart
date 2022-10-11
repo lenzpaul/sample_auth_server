@@ -5,45 +5,64 @@
 import 'dart:convert';
 
 import 'package:googleapis/firestore/v1.dart';
+import 'package:sample_auth_server/clients/firebase_auth_client.dart';
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf_router/shelf_router.dart' as shelf_router;
 import 'package:sample_auth_server/helpers.dart';
-import 'package:shelf/shelf.dart';
-import 'package:shelf_router/shelf_router.dart';
+import 'package:http/http.dart' as http;
 
 /// Wrapper for the Firestore API.
 class FirebaseApiRepository {
+  FirebaseApiRepository({required this.firebaseAuthClient})
+      : _api = FirestoreApi(firebaseAuthClient.authenticatedClient),
+        projectId = firebaseAuthClient.projectId;
 
+  final String projectId;
 
-  // final authClient; 
-  // final FirestoreApi _api = FirestoreApi(authClient);
+  final FirebaseAuthClient firebaseAuthClient;
+  final FirestoreApi _api;
 
-  // _init() async {
+  Future<shelf.Response> incrementHandler(shelf.Request request) async {
+    var projectId = FirebaseAuthClient.instance.projectId;
 
-  //   //     final projectId = await currentProjectId();
-  //   // print('Current GCP project id: $projectId');
+    final result = await _api.projects.databases.documents.commit(
+      _incrementRequest(FirebaseAuthClient.instance.projectId),
+      'projects/$projectId/databases/(default)',
+    );
 
-  //   // final authClient = await clientViaApplicationDefaultCredentials(
-  //   //   scopes: [FirestoreApi.datastoreScope],
-  //   // );
+    return shelf.Response.ok(
+      JsonUtf8Encoder(' ').convert(result),
+      headers: {
+        'content-type': 'application/json',
+      },
+    );
+  }
 
-    
-  // }
+  // get issues endpoint
+  Future<shelf.Response> getIssuesHandler(shelf.Request request) async {
+    final result = await _api.projects.databases.documents.list(
+      'projects/$projectId/databases/(default)/documents',
+      'issues',
+    );
 
-  void _init 
+    return shelf.Response.ok(
+      JsonUtf8Encoder(' ').convert(result),
+      headers: {
+        'content-type': 'application/json',
+      },
+    );
+  }
 
-  /// TODO: Move this to a separate file.
+  /// WIP
   Future firestoreQuery() async {
-
-
     try {
-      final api = FirestoreApi(authClient);
-
-      Future<Response> incrementHandler(Request request) async {
-        final result = await api.projects.databases.documents.commit(
+      Future<shelf.Response> incrementHandler(shelf.Request request) async {
+        final result = await _api.projects.databases.documents.commit(
           _incrementRequest(projectId),
           'projects/$projectId/databases/(default)',
         );
 
-        return Response.ok(
+        return shelf.Response.ok(
           JsonUtf8Encoder(' ').convert(result),
           headers: {
             'content-type': 'application/json',
@@ -51,11 +70,11 @@ class FirebaseApiRepository {
         );
       }
 
-      final router = Router()..get('/', incrementHandler);
+      final router = shelf_router.Router()..get('/', incrementHandler);
 
       await serveHandler(router);
     } finally {
-      authClient.close();
+      firebaseAuthClient.close();
     }
   }
 
