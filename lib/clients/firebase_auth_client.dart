@@ -31,9 +31,6 @@ class FirebaseAuthAPIMethods {
 /// Routes are defined in [_setupRouter].
 /// {@endtemplate}
 class FirebaseAuthClient {
-  /// {@macro firebase_auth_client}
-  factory FirebaseAuthClient() => instance; // Singleton
-
   // Private constructor to prevent instantiation.
   FirebaseAuthClient._();
 
@@ -41,7 +38,8 @@ class FirebaseAuthClient {
   static const firebaseAuthBaseUrl =
       'https://identitytoolkit.googleapis.com/v1/accounts';
 
-  static final instance = FirebaseAuthClient._();
+  static final _instance = FirebaseAuthClient._();
+  static get instance => _instance;
 
   late http.Client _authenticatedClient;
 
@@ -54,14 +52,27 @@ class FirebaseAuthClient {
   /// initialized in [initClient]
   late shelf_router.Router _router;
 
+  /// Runs the server.
+  ///
+  /// This is the entry point for the server.
+  static Future run() async {
+    await _instance.initClient();
+    try {
+      await serveHandler(
+          shelf.logRequests().addHandler(FirebaseAuthClient.instance.router));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// A [Router] that handles requests to the Firebase Auth REST API.
-  shelf_router.Router get router => _router;
+  shelf.Handler get router => _router;
 
   /// Same as [router], but with logging.
   shelf.Handler get routerWithLogging => shelf.logRequests().addHandler(router);
 
-  void close() {
-    _authenticatedClient.close();
+  static void close() {
+    FirebaseAuthClient.instance._authenticatedClient.close();
   }
 
   String get projectId => _projectId;

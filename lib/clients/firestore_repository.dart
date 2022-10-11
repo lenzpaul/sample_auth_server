@@ -54,29 +54,29 @@ class FirebaseApiRepository {
   }
 
   /// WIP
-  Future firestoreQuery() async {
-    try {
-      Future<shelf.Response> incrementHandler(shelf.Request request) async {
-        final result = await _api.projects.databases.documents.commit(
-          _incrementRequest(projectId),
-          'projects/$projectId/databases/(default)',
-        );
+  // Future firestoreQuery() async {
+  //   try {
+  //     Future<shelf.Response> incrementHandler(shelf.Request request) async {
+  //       final result = await _api.projects.databases.documents.commit(
+  //         _incrementRequest(projectId),
+  //         'projects/$projectId/databases/(default)',
+  //       );
 
-        return shelf.Response.ok(
-          JsonUtf8Encoder(' ').convert(result),
-          headers: {
-            'content-type': 'application/json',
-          },
-        );
-      }
+  //       return shelf.Response.ok(
+  //         JsonUtf8Encoder(' ').convert(result),
+  //         headers: {
+  //           'content-type': 'application/json',
+  //         },
+  //       );
+  //     }
 
-      final router = shelf_router.Router()..get('/', incrementHandler);
+  //     final router = shelf_router.Router()..get('/', incrementHandler);
 
-      await serveHandler(router);
-    } finally {
-      firebaseAuthClient.close();
-    }
-  }
+  //     await serveHandler(router);
+  //   } finally {
+  //     firebaseAuthClient.close();
+  //   }
+  // }
 
   CommitRequest _incrementRequest(String projectId) => CommitRequest(
         writes: [

@@ -27,12 +27,14 @@ This is a simple API, meant to be served on Google Cloud Run, that allows you to
 
 
 ## Deploying 
-- [Deploying on Google Cloud Run from source](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-service-other-languages#deploy)  
+See: [Deploying on Google Cloud Run from source](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-service-other-languages#deploy)  
 
 In a nutshell:
   - Deploy the service using gcloud sdk:  `gcloud run deploy`  
     - For region, use `us-central1`  
-    - To publish revisions, use `gcloud run deploy --image <container-image-url>`  
+    - To publish revisions, use 
+    `gcloud run deploy --source .`
+    <!-- `gcloud run deploy --image <container-image-url>`   -->
   - Set the environment variables 
     - I used [Secret Manager](https://cloud.google.com/secret-manager)  
     and [allowed Cloud Run to access secrets](https://cloud.google.com/run/docs/configuring/secrets#access-secret) 
