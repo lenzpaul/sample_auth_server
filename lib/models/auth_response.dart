@@ -36,7 +36,7 @@ class AuthResponse extends shelf.Response {
 
   /// Fail the login with a 401 status code and details about the error
   /// extracted from the [firebaseErrorResponseBody].
-  AuthResponse.fromFirebaseAuthErrorResponseBody(
+  AuthResponse.loginFailedFromFirebaseResponseBody(
       Object firebaseErrorResponseBody)
       : super.unauthorized(
           UnsuccessfulLogin.fromFirebaseError(firebaseErrorResponseBody)

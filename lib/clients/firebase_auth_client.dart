@@ -20,6 +20,7 @@ class FirebaseAuthAPIMethods {
 
   static const signInAnonymously = 'signUp';
   static const signInWithPassword = 'signInWithPassword';
+  static const signUp = 'signUp';
 }
 
 /// {@template firebase_auth_client}
@@ -38,9 +39,15 @@ class FirebaseAuthClient {
   static const firebaseAuthBaseUrl =
       'https://identitytoolkit.googleapis.com/v1/accounts';
 
+  static const verifyIdTokenUrl =
+      // 'https://function-1-k3wnvtq2fa-uc.a.run.app';
+      'https://verify-id-token-k3wnvtq2fa-uc.a.run.app';
+
   static final _instance = FirebaseAuthClient._();
   static get instance => _instance;
 
+  /// The authenticated client used to make requests to the Firebase Auth REST
+  /// API.
   late http.Client _authenticatedClient;
 
   /// Initialized in [initClient]
@@ -84,8 +91,21 @@ class FirebaseAuthClient {
 
     print('Current GCP project id: $_projectId');
 
+    // `clientViaApplicationDefaultCredentials` is a function from the
+    // `googleapis_auth` package. It authenticates the client using the
+    // application default credentials.
+    //
+    // The application default credentials are typically stored in:
+    // `$HOME/.config/gcloud/application_default_credentials.json`.
     _authenticatedClient = await clientViaApplicationDefaultCredentials(
-      scopes: [FirestoreApi.datastoreScope],
+      scopes: [
+        // Required to have access to user data
+        FirestoreApi.cloudPlatformScope,
+        // Required for Firestore
+        FirestoreApi.datastoreScope,
+        // Cloud functions
+        'https://www.googleapis.com/auth/cloud-platform',
+      ],
     );
 
     _firestoreRepository = FirebaseApiRepository(firebaseAuthClient: this);
@@ -118,6 +138,10 @@ class FirebaseAuthClient {
   static String get signInAnonymouslyUrl =>
       '$firebaseAuthBaseUrl:${FirebaseAuthAPIMethods.signInAnonymously}?key=$apiKey';
 
+  /// Appends the sign up method to the base URL.
+  static String get signUpUrl =>
+      '$firebaseAuthBaseUrl:${FirebaseAuthAPIMethods.signUp}?key=$apiKey';
+
   /// Handles requests to the Firebase Auth REST API for signing in anonymously.
   ///
   /// Does not require any headers or body.
@@ -144,7 +168,7 @@ class FirebaseAuthClient {
       response = AuthResponse.loginSuccesful(user);
     } else {
       // An error occurred.
-      response = AuthResponse.fromFirebaseAuthErrorResponseBody(result.body);
+      response = AuthResponse.loginFailedFromFirebaseResponseBody(result.body);
     }
 
     return response;
@@ -154,10 +178,18 @@ class FirebaseAuthClient {
   /// {authorization: 'Basic <base64 encoded email:password>'}
   ///
   /// Returns a [Response] with the following body:
+  /// ```json
   /// {
-  ///   "uid": "string",
-  ///   "email": "string"
+  ///   code: 200,
+  ///   message: "LOGIN_SUCCESS",
+  ///   userData: {
+  ///    'uid': 'xxxxx',
+  ///    'email': 'a@a.ca',
+  ///    'username': 'a',
+  ///    'isGuest': false,
+  ///   }
   /// }
+  /// ```
   Future<shelf.Response> loginWithEmailAndPasswordHandler(
       shelf.Request request) async
   //
@@ -189,6 +221,7 @@ class FirebaseAuthClient {
     var email = decodedString.split(':')[0];
     var password = decodedString.split(':')[1];
 
+    // final result = await _authenticatedClient.post(
     final result = await _authenticatedClient.post(
       Uri.parse(signInWithPasswordUrl),
       body: {
@@ -199,7 +232,7 @@ class FirebaseAuthClient {
 
     // Authentication not successful.
     if (result.statusCode != 200) {
-      return AuthResponse.fromFirebaseAuthErrorResponseBody(result.body);
+      return AuthResponse.loginFailedFromFirebaseResponseBody(result.body);
     }
 
     // Authentication successful.
@@ -215,11 +248,182 @@ class FirebaseAuthClient {
     return AuthResponse.loginSuccesful(user);
   }
 
+  /// Expects a [Request] with basic authorization with base64 encoded
+  /// credentials in the format of <email>:<password> and a body with the
+  /// desired username.
+  ///
+  /// Headers:
+  /// {authorization: 'Basic <base64 encoded email:password>'}
+  ///
+  /// Body:
+  /// ```json
+  /// {
+  ///  "username": "string",
+  /// }
+  /// ```
+  ///
+  /// Returns a [Response] with the following body:
+  /// ```json
+  /// {
+  ///   code: 200,
+  ///   message: "SIGNUP_SUCCESS",
+  ///   userData: {
+  ///     'uid': 'xxxxx',
+  ///     'email': '
+  ///     'username': 'a',
+  ///     'isGuest': false,
+  ///   }
+  /// }
+  /// ```
+  /// or
+  /// ```json
+  /// {
+  ///  code: 400,
+  /// message: "SIGNUP_FAILED",
+  /// }
+  /// ```
+  // WIP
+  // Future<shelf.Response> signUpWithEmailAndPasswordHandler(
+  //     shelf.Request request) async
+  // //
+  // {
+  //   var authorization = request.headers['authorization'];
+  //   if (authorization == null) {
+  //     return AuthResponse.badRequest('Authorization header is missing');
+  //   }
+
+  //   // Check authorization header for the type of authentication. Only support
+  //   // Firebase authentication for now with Basic Auth base64 encoded.
+  //   var authType = authorization.split(' ')[0];
+
+  //   // Unsupported authentication type provided.
+  //   if (authType != 'Basic') {
+  //     return AuthResponse.badRequest(
+  //       'Unsupported authentication type. Only Basic Auth is supported.',
+  //     );
+  //   }
+
+  //   // The authorization type is Basic. Decode the base64 encoded
+  //   // credentials and send to Firebase for authentication.
+  //   //
+  //   // The encoded credentials are expected to be in the format of
+  //   // <email>:<password>.
+  //   var authValue = authorization.split(' ')[1]; // base64 encoded credentials
+  //   var decoded = base64.decode(authValue); // decoded credentials in bytes
+  //   var decodedString = utf8.decode(decoded); // decoded credentials in string
+  //   var email = decodedString.split(':')[0];
+  //   var password = decodedString.split(':')[1];
+
+  //   // Get the username from the request body.
+  //   var body = await request.readAsString();
+  //   var username = jsonDecode(body)['username'];
+
+  //   // Send the request to Firebase.
+  //   final result = await _authenticatedClient.post(
+  //     Uri.parse(signUpUrl),
+  //     body: {
+  //       'email': email,
+  //       'password': password,
+  //       'returnSecureToken': true,
+  //     },
+  //   );
+
+  //   // Sign up not successful.
+  //   if (result.statusCode != 200) {
+  //     return AuthResponse.fromFirebaseAuthErrorResponseBody(result.body);
+  //   }
+
+  //   // Sign up successful.
+  //   //
+  //   // Return the uid and the email of the firebase user.
+  //   final Map<String, dynamic> body = jsonDecode(result.body);
+
+  //   var user = AuthUser(
+  //     email: body['email'],
+  //     uid: body['localId'],
+  //   );
+
+  //   return AuthResponse.signUpSuccesful(user);
+  // }
+
+  /// verifyIdTokenHandler
+  Future<shelf.Response> verifyIdTokenHandler(shelf.Request request) async {
+    var authorizationHeader = request.headers['authorization'];
+    if (authorizationHeader == null) {
+      return AuthResponse.badRequest('Authorization header is missing');
+    }
+
+    // Check authorization header for the Bearer token.
+    var authType = authorizationHeader.split(' ')[0];
+
+    // Unsupported authentication type provided.
+    if (authType != 'Bearer') {
+      return AuthResponse.badRequest(
+        'Unsupported authentication type. Only Bearer Auth is supported.',
+      );
+    }
+
+    // The authorization type is Bearer. Get the idToken.
+    var idToken = authorizationHeader.split(' ')[1];
+
+    // Get the idToken from the request header.
+
+    // var idToken = request.headers['idToken'];
+    // if (idToken == null) {
+    //   return AuthResponse.badRequest('idToken header is missing');
+    // }
+
+    try {
+      final Map<String, dynamic> result = decodeJwt(idToken);
+
+      // Check if the token is expired.
+      if (result['exp'] * 1000 < DateTime.now().millisecondsSinceEpoch) {
+        // Token is expired.
+        return shelf.Response.unauthorized(
+          prettyJsonEncode(
+            {
+              'code': 401,
+              'message': 'TOKEN_EXPIRED',
+            },
+          ),
+        );
+      }
+
+      // Token is not expired.
+      return shelf.Response.ok(
+        // TODO: Create a method to format the response.
+        prettyJsonEncode(
+          {
+            'code': 200,
+            'message': 'TOKEN_VALID',
+            'userData': {
+              'uid': result['user_id'],
+              'email': result['email'],
+            },
+          },
+        ),
+      );
+    } catch (e) {
+      print(e);
+
+      return shelf.Response.unauthorized(
+        prettyJsonEncode(
+          {
+            'code': 401,
+            'message': 'ID_TOKEN_VERIFICATION_FAILED',
+          },
+        ),
+      );
+    }
+  }
+
   /// Sets up the [Router] and defines the request handlers.
   void _setupRouter() {
     this._router = (shelf_router.Router())
       ..get('/login', loginWithEmailAndPasswordHandler)
       ..get('/loginAnonymously', loginAnonymouslyHandler)
+      // ..get('/signUp', signUpHandler)
+      ..get('/verifyIdToken', verifyIdTokenHandler)
       ..get('/db', _firestoreRepository.incrementHandler)
       ..get('/issues', _firestoreRepository.getIssuesHandler);
   }

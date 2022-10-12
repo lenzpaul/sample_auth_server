@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
@@ -219,3 +220,12 @@ String prettyJsonEncode(Object? object) =>
 Map<String, String> get jsonContentTypeHeader => {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
     };
+
+/// Decode a JWT token and return the payload.
+Map<String, dynamic> decodeJwt(String token) {
+  Map<String, dynamic> tokenMap = JwtDecoder.decode(token);
+
+  print('tokenMap: ${prettyJsonEncode(tokenMap)}');
+
+  return tokenMap;
+}

@@ -1,0 +1,19 @@
+{
+    "iss": "https://securetoken.google.com/cmic-sample-issue-tracker",
+    "aud": "cmic-sample-issue-tracker",
+    "auth_time": 1665537095,
+    "user_id": "tTdtlWAyXrZmOIsBMGVr217xyS22",
+    "sub": "tTdtlWAyXrZmOIsBMGVr217xyS22",
+    "iat": 1665537095,
+    "exp": 1665540695,
+    "email": "sample_user@sample.com",
+    "email_verified": false,
+    "firebase": {
+        "identities": {
+            "email": [
+                "sample_user@sample.com"
+            ]
+        },
+        "sign_in_provider": "password"
+    }
+}
