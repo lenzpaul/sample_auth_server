@@ -246,12 +246,13 @@ class FirebaseAuthClient {
     var password = decodedString.split(':')[1];
 
     // final result = await _authenticatedClient.post(
-    final result = await _authenticatedClient.post(
+    final result = await _client.post(
       Uri.parse(signInWithPasswordUrl),
-      body: {
+      body: jsonEncode({
         'email': email,
         'password': password,
-      },
+        'returnSecureToken': true,
+      }),
     );
 
     // Authentication not successful.
@@ -261,12 +262,15 @@ class FirebaseAuthClient {
 
     // Authentication successful.
     //
-    // Return the uid and the email of the firebase user.
+    // Return the user data.
     final Map<String, dynamic> body = jsonDecode(result.body);
 
     var user = AuthUser(
       email: body['email'],
       uid: body['localId'],
+      isGuest: false,
+      username: body['displayName'],
+      idToken: body['idToken'],
     );
 
     return AuthResponse.loginSuccesful(user);
