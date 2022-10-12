@@ -150,7 +150,7 @@ const gcpProjectIdEnvironmentVariables = {
 /// debugging in VS Code, for example.
 String? getEnvVar(String key, {useDotEnv = false}) {
   // DEBUG: Uncomment to debug using VS Code
-  // useDotEnv = isInDebugMode;
+  useDotEnv = isInDebugMode;
 
   if (useDotEnv) {
     var env = DotEnv(includePlatformEnvironment: true)..load();
@@ -228,4 +228,33 @@ Map<String, dynamic> decodeJwt(String token) {
   print('tokenMap: ${prettyJsonEncode(tokenMap)}');
 
   return tokenMap;
+}
+
+/// Check if the JWT token is expired.
+bool isJwtExpired(String token) => JwtDecoder.isExpired(token);
+
+// TODO: Helper method to Verify the JWT token using the public key
+// from the JWKS endpoint.
+
+// See:
+// * https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_a_third-party_jwt_library
+// * https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com
+// 'iss' should == 'https://securetoken.google.com/$_projectId'
+/// Verify the JWT token.
+///
+/// Returns `true` if the token is valid.
+///
+///
+/// Currently, this method only verifies whether the token is expired.
+bool verifyJwt(String token) {
+  bool tokenIsValid = false;
+
+  try {
+    tokenIsValid = !isJwtExpired(token);
+  } catch (e) {
+    print('verifyJwt: Error: $e');
+    tokenIsValid = false;
+  }
+
+  return tokenIsValid;
 }

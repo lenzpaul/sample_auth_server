@@ -1,0 +1,30 @@
+{
+    "code": 200,
+    "message": "PROFILE_RETRIEVED",
+    "data": {
+        "kind": "identitytoolkit#GetAccountInfoResponse",
+        "users": [
+            {
+                "localId": "e157H1M1i9gEbeGnPGPqiJDSpBp1",
+                "email": "l@l.ca",
+                "displayName": "larry",
+                "passwordHash": "UkVEQUNURUQ=",
+                "emailVerified": false,
+                "passwordUpdatedAt": 1665603980872,
+                "providerUserInfo": [
+                    {
+                        "providerId": "password",
+                        "displayName": "larry",
+                        "federatedId": "l@l.ca",
+                        "email": "l@l.ca",
+                        "rawId": "l@l.ca"
+                    }
+                ],
+                "validSince": "1665603980",
+                "lastLoginAt": "1665603980872",
+                "createdAt": "1665603980872",
+                "lastRefreshAt": "2022-10-12T19:46:20.872Z"
+            }
+        ]
+    }
+}

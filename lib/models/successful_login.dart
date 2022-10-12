@@ -4,9 +4,10 @@ import 'package:sample_auth_server/helpers.dart';
 import 'package:sample_auth_server/models/auth_response_body.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
 
+/// {@template successful_login}
 /// A successful login response body.
 ///
-/// Contains a [User] on successful login.
+/// Contains a [AuthUser] on successful login.
 ///
 /// Format:
 /// ```json
@@ -21,9 +22,11 @@ import 'package:sample_auth_server/models/auth_user.dart';
 ///   }
 /// }
 /// ```
+/// {@endtemplate}
 class SuccessfulLogin extends AuthResponseBody {
   final AuthUser userData;
 
+  /// {@macro successful_login}
   SuccessfulLogin({
     String message = 'LOGIN_SUCCESS',
     required this.userData,

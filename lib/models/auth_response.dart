@@ -27,6 +27,29 @@ class AuthResponse extends shelf.Response {
           headers: jsonContentTypeHeader,
         );
 
+  /// Successful signup response, with a 200 status code and details about the
+  /// user.
+  ///
+  /// ```json
+  /// {
+  ///   code: 200,
+  ///   message: "SIGNUP_SUCCESS",
+  ///   userData: {
+  ///     'uid': 'xxxxx',
+  ///     'email': email@email.ca',
+  ///     'username': 'a',
+  ///     'isGuest': false
+  ///   }
+  /// }
+  ///
+  AuthResponse.signUpSuccesful(AuthUser user)
+      : super.ok(
+          // TODO: Add SignUpResponse
+          SuccessfulLogin(userData: user).toJson(),
+          encoding: utf8,
+          headers: jsonContentTypeHeader,
+        );
+
   AuthResponse.loginFailed({String? errorDescription})
       : super.unauthorized(
           UnsuccessfulLogin(errorDescription: errorDescription).toJson(),
@@ -36,8 +59,7 @@ class AuthResponse extends shelf.Response {
 
   /// Fail the login with a 401 status code and details about the error
   /// extracted from the [firebaseErrorResponseBody].
-  AuthResponse.loginFailedFromFirebaseResponseBody(
-      Object firebaseErrorResponseBody)
+  AuthResponse.failedWithFirebaseResponseBody(Object firebaseErrorResponseBody)
       : super.unauthorized(
           UnsuccessfulLogin.fromFirebaseError(firebaseErrorResponseBody)
               .toJson(),
