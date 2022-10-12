@@ -3,7 +3,7 @@
 import 'dart:async';
 
 import 'package:http/http.dart' as http;
-import 'package:sample_auth_server/clients/firestore_repository.dart';
+// import 'package:sample_auth_server/clients/firestore_repository.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf_router/shelf_router.dart' as shelf_router;
 import 'package:sample_auth_server/helpers.dart';
@@ -11,6 +11,8 @@ import 'dart:convert';
 import 'package:sample_auth_server/models/models.dart';
 import 'package:googleapis/firestore/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
+
+part 'firestore_repository.dart';
 
 /// Name of the methods to call on the [FirebaseAuthClient] class.
 ///
@@ -346,7 +348,22 @@ class FirebaseAuthClient {
   //   return AuthResponse.signUpSuccesful(user);
   // }
 
-  /// verifyIdTokenHandler
+  /// Expects a [Request] with `Bearer <idToken>` in the authorization header.
+  ///
+  /// Returns a [Response] with the following body:
+  ///
+  /// Returns a successful response if the token is valid and not expired. The
+  /// response body contains the user data in the following format:
+  /// ```json
+  /// {
+  ///   'code': 200,
+  ///   'message': 'TOKEN_VALID',
+  ///   'userData': {
+  ///     'uid': result['user_id'],
+  ///     'email': result['email'],
+  ///   },
+  /// },
+  /// ```
   Future<shelf.Response> verifyIdTokenHandler(shelf.Request request) async {
     var authorizationHeader = request.headers['authorization'];
     if (authorizationHeader == null) {
@@ -365,13 +382,6 @@ class FirebaseAuthClient {
 
     // The authorization type is Bearer. Get the idToken.
     var idToken = authorizationHeader.split(' ')[1];
-
-    // Get the idToken from the request header.
-
-    // var idToken = request.headers['idToken'];
-    // if (idToken == null) {
-    //   return AuthResponse.badRequest('idToken header is missing');
-    // }
 
     try {
       final Map<String, dynamic> result = decodeJwt(idToken);
