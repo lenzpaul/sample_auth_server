@@ -1,8 +1,10 @@
 // ignore_for_file: unnecessary_this, no_leading_underscores_for_local_identifiers
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:markdown/markdown.dart' as md;
 // import 'package:sample_auth_server/clients/firestore_repository.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf_router/shelf_router.dart' as shelf_router;
@@ -734,6 +736,21 @@ class FirebaseAuthClient {
     );
   }
 
+  /// GET /
+  ///
+  /// Serves README.md as the main page.
+  Future<shelf.Response> getReadmeHandler(shelf.Request request) async {
+    var readmeFile = File('README.md');
+    var readmeMarkdown = await readmeFile.readAsString();
+    var readmeHtml = md.markdownToHtml(readmeMarkdown);
+    return shelf.Response.ok(
+      readmeHtml,
+      headers: {'Content-Type': 'text/html'},
+    );
+
+    // return shelf.Response.ok(readme);
+  }
+
   /// Calls another handler function and returns the response.
   // Future<shelf.Response> _callHandler(
   //   shelf.Request request,
@@ -751,12 +768,12 @@ class FirebaseAuthClient {
     this._router = (shelf_router.Router())
       ..post('/login', loginWithEmailAndPasswordHandler)
       ..post('/loginAnonymously', loginAnonymouslyHandler)
-      // ..get('/signUp', signUpHandler)
+      ..post('/signup', signUpWithEmailAndPasswordHandler)
+      ..post('/updateProfile', updateProfileHandler)
       ..get('/verifyIdToken', verifyIdTokenHandler)
       ..get('/db', _firestoreRepository.incrementHandler)
       ..get('/issues', _firestoreRepository.getIssuesHandler)
-      ..post('/updateProfile', updateProfileHandler)
-      ..post('/signup', signUpWithEmailAndPasswordHandler)
-      ..get('/getProfile', getProfileHandler);
+      ..get('/getProfile', getProfileHandler)
+      ..get('/', getReadmeHandler);
   }
 }
