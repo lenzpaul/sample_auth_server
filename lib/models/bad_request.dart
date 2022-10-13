@@ -14,7 +14,7 @@ class BadRequestResponseBody extends AuthResponseBody {
       : this.errorDescription = errorDescription ?? kBadRequest,
         super(
           statusCode: 400,
-          message: kBadRequest,
+          kDefaultMessage: kBadRequest,
         );
 
   BadRequestResponseBody copyWith({
@@ -64,10 +64,12 @@ class BadRequestResponseBody extends AuthResponseBody {
 
     return other.errorDescription == errorDescription &&
         other.statusCode == statusCode &&
-        other.message == message;
+        other.kDefaultMessage == kDefaultMessage;
   }
 
   @override
   int get hashCode =>
-      errorDescription.hashCode ^ statusCode.hashCode ^ message.hashCode;
+      errorDescription.hashCode ^
+      statusCode.hashCode ^
+      kDefaultMessage.hashCode;
 }

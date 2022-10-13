@@ -8,15 +8,15 @@ import 'package:sample_auth_server/helpers.dart';
 abstract class AuthResponseBody {
   AuthResponseBody({
     required this.statusCode,
-    required this.message,
+    required this.kDefaultMessage,
   });
   final int statusCode;
-  final String message;
+  final String kDefaultMessage;
 
   Map<String, dynamic> toMap() {
     return {
       'code': statusCode,
-      'message': message,
+      'message': kDefaultMessage,
     };
   }
 

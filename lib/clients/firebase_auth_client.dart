@@ -198,6 +198,8 @@ class FirebaseAuthClient {
     return response;
   }
 
+  /// POST /login
+  ///
   /// Expects a [Request] with authorization header as follows:
   /// {authorization: 'Basic <base64 encoded email:password>'}
   ///
@@ -383,14 +385,8 @@ class FirebaseAuthClient {
     if (result.statusCode != 200) {
       var res = AuthResponse.signupFailedFromFirebaseResponse(result.body);
 
-      if (isInDebugMode) {
-        var resJson = res.toString();
-        var resString = await res.readAsString();
-        var resJson2 = jsonDecode(resString);
-        var err = resJson2['error'];
+      print(res.body);
 
-        print('resString: $resString');
-      }
       // print('Sign up failed: ${res.readAsString()}');
       return res;
     }
@@ -753,8 +749,8 @@ class FirebaseAuthClient {
   /// Sets up the [Router] and defines the request handlers.
   void _setupRouter() {
     this._router = (shelf_router.Router())
-      ..get('/login', loginWithEmailAndPasswordHandler)
-      ..get('/loginAnonymously', loginAnonymouslyHandler)
+      ..post('/login', loginWithEmailAndPasswordHandler)
+      ..post('/loginAnonymously', loginAnonymouslyHandler)
       // ..get('/signUp', signUpHandler)
       ..get('/verifyIdToken', verifyIdTokenHandler)
       ..get('/db', _firestoreRepository.incrementHandler)

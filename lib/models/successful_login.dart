@@ -30,15 +30,7 @@ class SuccessfulLogin extends AuthResponseBody {
   SuccessfulLogin({
     String message = 'LOGIN_SUCCESS',
     required this.userData,
-  }) : super(statusCode: 200, message: message);
-
-  SuccessfulLogin copyWith({
-    AuthUser? userData,
-  }) {
-    return SuccessfulLogin(
-      userData: userData ?? this.userData,
-    );
-  }
+  }) : super(statusCode: 200, kDefaultMessage: message);
 
   @override
   Map<String, dynamic> toMap() => super.toMap()
@@ -47,7 +39,9 @@ class SuccessfulLogin extends AuthResponseBody {
     });
 
   factory SuccessfulLogin.fromMap(Map<String, dynamic> map) {
+    String? message = map['message'];
     return SuccessfulLogin(
+      message: message ?? 'LOGIN_SUCCESS',
       userData: AuthUser.fromMap(map['userData'] as Map<String, dynamic>),
     );
   }
