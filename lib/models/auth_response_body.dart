@@ -1,3 +1,5 @@
+import 'package:sample_auth_server/helpers.dart';
+
 /// Body of the [AuthResponse] object.
 ///
 /// Contains a [User] on successful login.
@@ -17,4 +19,6 @@ abstract class AuthResponseBody {
       'message': message,
     };
   }
+
+  String toJson() => prettyJsonEncode(toMap());
 }

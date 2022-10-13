@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:sample_auth_server/helpers.dart';
+import 'package:sample_auth_server/models/auth_response_body.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
 import 'package:sample_auth_server/models/bad_request.dart';
+import 'package:sample_auth_server/models/firebase_auth_error.dart';
 import 'package:sample_auth_server/models/successful_login.dart';
 import 'package:sample_auth_server/models/unsuccesful_login.dart';
 import 'package:shelf/shelf.dart' as shelf;
@@ -20,12 +22,35 @@ import 'package:shelf/shelf.dart' as shelf;
 /// An unsuccessful login response contains an error message as an `error` key,
 /// see [UnsuccessfulLogin].
 class AuthResponse extends shelf.Response {
-  AuthResponse.loginSuccesful(AuthUser user)
-      : super.ok(
-          SuccessfulLogin(userData: user).toJson(),
-          encoding: utf8,
-          headers: jsonContentTypeHeader,
+  // AuthResponse._();
+
+  /// The body of the response.
+  ///
+  /// It contains a [AuthResponseBody] which we can call
+  /// [AuthResponseBody.toMap] on.
+  final AuthResponseBody body;
+
+  AuthResponse._({required this.body, int statusCode = 200})
+      : super(
+          statusCode,
+          body: body.toJson(),
+          headers: {'Content-Type': 'application/json'},
         );
+
+  factory AuthResponse.loginSuccesful(AuthUser user) {
+    return AuthResponse._(
+      body: SuccessfulLogin(userData: user),
+      statusCode: 200,
+    );
+  }
+
+  // AuthResponse.loginSuccesful(AuthUser user)
+  //     : body = SuccessfulLogin(userData: user),
+  //       super.ok(
+  //         SuccessfulLogin(userData: user).toJson(),
+  //         encoding: utf8,
+  //         headers: jsonContentTypeHeader,
+  //       );
 
   /// Successful signup response, with a 200 status code and details about the
   /// user.
@@ -76,4 +101,28 @@ class AuthResponse extends shelf.Response {
           encoding: utf8,
           headers: jsonContentTypeHeader,
         );
+
+  /// Badly formatted request, with a 400 status code and details about the
+  /// error.
+  AuthResponse.signUpFailed([String? errorDescription])
+      : super.badRequest(
+          body: BadRequestResponseBody(
+            errorDescription: errorDescription,
+          ).toJson(),
+          encoding: utf8,
+          headers: jsonContentTypeHeader,
+        );
+
+  /// Create a response from a [FirebaseAuthError] json.
+  AuthResponse.signupFailedFromFirebaseResponse(
+      String firebaseErrorJsonResponseBody)
+      : super.badRequest(
+          body: BadRequestResponseBody.fromFirebaseErrorJson(
+            firebaseErrorJsonResponseBody,
+          ).toJson(),
+          encoding: utf8,
+          headers: jsonContentTypeHeader,
+        );
+
+  toJson() {}
 }

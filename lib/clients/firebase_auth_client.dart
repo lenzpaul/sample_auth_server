@@ -381,7 +381,18 @@ class FirebaseAuthClient {
 
     // Sign up not successful.
     if (result.statusCode != 200) {
-      return AuthResponse.failedWithFirebaseResponseBody(result.body);
+      var res = AuthResponse.signupFailedFromFirebaseResponse(result.body);
+
+      if (isInDebugMode) {
+        var resJson = res.toString();
+        var resString = await res.readAsString();
+        var resJson2 = jsonDecode(resString);
+        var err = resJson2['error'];
+
+        print('resString: $resString');
+      }
+      // print('Sign up failed: ${res.readAsString()}');
+      return res;
     }
 
     // Sign up successful. Get the uid of the newly created user.
@@ -749,7 +760,7 @@ class FirebaseAuthClient {
       ..get('/db', _firestoreRepository.incrementHandler)
       ..get('/issues', _firestoreRepository.getIssuesHandler)
       ..post('/updateProfile', updateProfileHandler)
-      ..post('/signUp', signUpWithEmailAndPasswordHandler)
+      ..post('/signup', signUpWithEmailAndPasswordHandler)
       ..get('/getProfile', getProfileHandler);
   }
 }
