@@ -73,7 +73,9 @@ In a nutshell:
   - Set the environment variables 
     - I used [Secret Manager](https://cloud.google.com/secret-manager) to store the environment variables. Then [set the environment variables in Cloud Run](https://cloud.google.com/run/docs/configuring/secrets#access-secret)   
 
-## Running locally
+## Running locally from shell
+
+### Prerequisites 
 First set the following environment variables:
 - `GOOGLE_APPLICATION_CREDENTIALS` - path to the service account key file
 - `GCP_PROJECT` - the project ID
@@ -82,7 +84,9 @@ First set the following environment variables:
 > Note: For convenience, you can use [this script](set_env.sh) to set the environment variables from a file. See sample env file [here](.env_example).   
 > `$ source set_env.sh <path-to-env-file>`  
 
-Then run the server:
+
+### Run the server
+
 - `dart pub get`
 - `dart run bin/server.dart`
  
@@ -90,6 +94,30 @@ or as an executable:
   - get the dependencies: `dart pub get`
   - build: `dart compile exe bin/server.dart -o bin/server`
   - run: `bin/server` 
+
+
+## Running locally as a Docker container
+
+### Prerequisites 
+Create a .env file with the following environment variables:
+- `GOOGLE_APPLICATION_CREDENTIALS` - path to the service account key file
+  - The file should be in the root directory of the project and should be named `.google_application_default_credentials.json`
+- `GCP_PROJECT` - the project ID
+- `FIREBASE_API_KEY` - the API key for the Firebase project (see [here](https://firebase.google.com/docs/projects/api-keys)
+
+
+### Build the Docker image
+  > You will need a service account key file to build the image. Make sure that it is 
+  named ***.google_application_default_credentials.json*** and placed in the root
+  directory. The `debug` flag ensure that the service account key file to the image.  
+
+  -  `docker image build -t sample_server --build-arg build_env=debug .`
+
+
+### Run the Docker container
+Run the container with env variables from a env file called `.env` in the root directory
+  - `docker run --env-file .env -p 8080:8080 sample_server`
+
 
 
 
