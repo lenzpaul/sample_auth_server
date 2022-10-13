@@ -4,9 +4,10 @@ import 'package:sample_auth_server/helpers.dart';
 import 'package:sample_auth_server/models/auth_response_body.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
 
+/// {@template successful_login}
 /// A successful login response body.
 ///
-/// Contains a [User] on successful login.
+/// Contains a [AuthUser] on successful login.
 ///
 /// Format:
 /// ```json
@@ -21,21 +22,15 @@ import 'package:sample_auth_server/models/auth_user.dart';
 ///   }
 /// }
 /// ```
+/// {@endtemplate}
 class SuccessfulLogin extends AuthResponseBody {
   final AuthUser userData;
 
+  /// {@macro successful_login}
   SuccessfulLogin({
     String message = 'LOGIN_SUCCESS',
     required this.userData,
-  }) : super(statusCode: 200, message: message);
-
-  SuccessfulLogin copyWith({
-    AuthUser? userData,
-  }) {
-    return SuccessfulLogin(
-      userData: userData ?? this.userData,
-    );
-  }
+  }) : super(statusCode: 200, kDefaultMessage: message);
 
   @override
   Map<String, dynamic> toMap() => super.toMap()
@@ -44,7 +39,9 @@ class SuccessfulLogin extends AuthResponseBody {
     });
 
   factory SuccessfulLogin.fromMap(Map<String, dynamic> map) {
+    String? message = map['message'];
     return SuccessfulLogin(
+      message: message ?? 'LOGIN_SUCCESS',
       userData: AuthUser.fromMap(map['userData'] as Map<String, dynamic>),
     );
   }

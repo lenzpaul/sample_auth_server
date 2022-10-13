@@ -8,18 +8,19 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:shelf/shelf.dart';
-import 'package:shelf/shelf_io.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf/shelf_io.dart' as shelf_io;
 
 /// Serves [handler] on [InternetAddress.anyIPv4] using the port returned by
 /// [listenPort].
 ///
 /// The returned [Future] will complete using [terminateRequestFuture] after
 /// closing the server.
-Future<void> serveHandler(Handler handler) async {
+Future<void> serveHandler(shelf.Handler handler) async {
   final port = listenPort();
 
-  final server = await serve(
+  final server = await shelf_io.serve(
     handler,
     InternetAddress.anyIPv4, // Allows external connections
     port,
@@ -219,3 +220,41 @@ String prettyJsonEncode(Object? object) =>
 Map<String, String> get jsonContentTypeHeader => {
       HttpHeaders.contentTypeHeader: ContentType.json.toString(),
     };
+
+/// Decode a JWT token and return the payload.
+Map<String, dynamic> decodeJwt(String token) {
+  Map<String, dynamic> tokenMap = JwtDecoder.decode(token);
+
+  print('tokenMap: ${prettyJsonEncode(tokenMap)}');
+
+  return tokenMap;
+}
+
+/// Check if the JWT token is expired.
+bool isJwtExpired(String token) => JwtDecoder.isExpired(token);
+
+// TODO: Helper method to Verify the JWT token using the public key
+// from the JWKS endpoint.
+
+// See:
+// * https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_a_third-party_jwt_library
+// * https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com
+// 'iss' should == 'https://securetoken.google.com/$_projectId'
+/// Verify the JWT token.
+///
+/// Returns `true` if the token is valid.
+///
+///
+/// Currently, this method only verifies whether the token is expired.
+bool verifyJwt(String token) {
+  bool tokenIsValid = false;
+
+  try {
+    tokenIsValid = !isJwtExpired(token);
+  } catch (e) {
+    print('verifyJwt: Error: $e');
+    tokenIsValid = false;
+  }
+
+  return tokenIsValid;
+}

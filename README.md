@@ -27,10 +27,14 @@ This is a simple API, meant to be served on Google Cloud Run, that allows you to
 
 
 ## Deploying 
-- [Deploying on Google Cloud Run from source](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-service-other-languages#deploy)  
+See: [Deploying on Google Cloud Run from source](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-service-other-languages#deploy)  
 
 In a nutshell:
-  - Deploy the service using gcloud sdk:  `gcloud run deploy`
+  - Deploy the service using gcloud sdk:  `gcloud run deploy`  
+    - For region, use `us-central1`  
+    - To publish revisions, use 
+    `gcloud run deploy --source .`
+    <!-- `gcloud run deploy --image <container-image-url>`   -->
   - Set the environment variables 
     - I used [Secret Manager](https://cloud.google.com/secret-manager)  
     and [allowed Cloud Run to access secrets](https://cloud.google.com/run/docs/configuring/secrets#access-secret) 
@@ -41,8 +45,8 @@ First set the following environment variables:
 - `GCP_PROJECT` - the project ID
 - `FIREBASE_API_KEY` - the API key for the Firebase project (see [here](https://firebase.google.com/docs/projects/api-keys)
 
-> Note: For convenience, you can use [this script](set_env.sh) to set the environment variables from a file. See sample env file [here](.env_example).
-
+> Note: For convenience, you can use [this script](set_env.sh) to set the environment variables from a file. See sample env file [here](.env_example).   
+> `$ source set_env.sh .env`
 
 Then run the following commands:
 - `dart pub get`

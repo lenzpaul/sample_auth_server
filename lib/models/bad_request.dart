@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:sample_auth_server/helpers.dart';
 import 'package:sample_auth_server/models/auth_response_body.dart';
+import 'package:sample_auth_server/models/firebase_auth_error.dart';
 
 class BadRequestResponseBody extends AuthResponseBody {
   static const String kBadRequest = 'BAD_REQUEST';
@@ -13,7 +14,7 @@ class BadRequestResponseBody extends AuthResponseBody {
       : this.errorDescription = errorDescription ?? kBadRequest,
         super(
           statusCode: 400,
-          message: kBadRequest,
+          kDefaultMessage: kBadRequest,
         );
 
   BadRequestResponseBody copyWith({
@@ -27,10 +28,8 @@ class BadRequestResponseBody extends AuthResponseBody {
   }
 
   @override
-  Map<String, dynamic> toMap() => super.toMap()
-    ..addAll({
-      'error': errorDescription,
-    });
+  Map<String, dynamic> toMap() =>
+      super.toMap()..addAll({'error': errorDescription});
 
   factory BadRequestResponseBody.fromMap(Map<String, dynamic> map) {
     return BadRequestResponseBody(
@@ -44,6 +43,17 @@ class BadRequestResponseBody extends AuthResponseBody {
       BadRequestResponseBody.fromMap(
           json.decode(source) as Map<String, dynamic>);
 
+  factory BadRequestResponseBody.fromFirebaseErrorJson(String source) {
+    FirebaseAuthError firebaseAuthError = FirebaseAuthError.fromJson(source);
+
+    var errorMsg = firebaseAuthError.message;
+    if (errorMsg == null) return BadRequestResponseBody();
+
+    return BadRequestResponseBody(
+      errorDescription: errorMsg,
+    );
+  }
+
   @override
   String toString() =>
       'BadRequestResponseBody(errorDescription: $errorDescription)';
@@ -54,10 +64,12 @@ class BadRequestResponseBody extends AuthResponseBody {
 
     return other.errorDescription == errorDescription &&
         other.statusCode == statusCode &&
-        other.message == message;
+        other.kDefaultMessage == kDefaultMessage;
   }
 
   @override
   int get hashCode =>
-      errorDescription.hashCode ^ statusCode.hashCode ^ message.hashCode;
+      errorDescription.hashCode ^
+      statusCode.hashCode ^
+      kDefaultMessage.hashCode;
 }
