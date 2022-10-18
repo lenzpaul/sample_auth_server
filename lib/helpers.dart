@@ -149,17 +149,17 @@ const gcpProjectIdEnvironmentVariables = {
 /// the `.env` file if it exists. This is useful for local development and
 /// debugging in VS Code, for example.
 String? getEnvVar(String key, {useDotEnv = false}) {
-  // DEBUG: Uncomment to debug using VS Code
-  // useDotEnv = isInDebugMode;
-
-  if (useDotEnv) {
+  // [isInDebugMode] is  `true` when debugging in VS Code.
+  //
+  // VS Code does not easily support loading environment variables. So when
+  // debugging in VS Code, we use the dotenv package to load the environment
+  // variables from the .env file, if it exists.
+  if (useDotEnv || isInDebugMode) {
     var env = DotEnv(includePlatformEnvironment: true)..load();
     return env[key];
   }
 
   return Platform.environment[key];
-
-  // return Platform.environment[key];
 }
 
 /// Checks if Dart is running in debug mode. Useful for debugging in VS Code,
