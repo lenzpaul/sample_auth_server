@@ -3,6 +3,11 @@
 
 import 'dart:convert';
 
+/// An error response from the Firebase Authentication API.
+///
+/// See https://firebase.google.com/docs/reference/rest/auth#section-error-response
+///
+/// e.g.:
 /// {
 ///     "error": {
 ///         "code": 400,

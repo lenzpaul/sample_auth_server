@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:sample_auth_server/helpers.dart';
-import 'package:sample_auth_server/models/auth_response_body.dart';
+import 'package:sample_auth_server/models/responses/auth_response_body.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
 
 class SuccessfulSignup extends AuthResponseBody {

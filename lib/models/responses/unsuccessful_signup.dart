@@ -3,7 +3,7 @@
 import 'dart:convert';
 
 import 'package:sample_auth_server/helpers.dart';
-import 'package:sample_auth_server/models/auth_response_body.dart';
+import 'package:sample_auth_server/models/responses/auth_response_body.dart';
 
 /// The response body for a failed login.
 ///
@@ -11,27 +11,27 @@ import 'package:sample_auth_server/models/auth_response_body.dart';
 /// ```json
 /// {
 ///   "code": 401,
-///   "message": "LOGIN_FAILED",
+///   "message": "SIGNUP_FAILED",
 ///   "error": "Invalid email or password"
 /// }
 /// ```
-class UnsuccessfulLogin extends AuthResponseBody {
-  static const String kLoginFailed = 'LOGIN_FAILED';
+class UnsuccessfulSignup extends AuthResponseBody {
+  static const String _defaultErrorMessage = 'SIGNUP_FAILED';
   final String errorDescription;
 
-  UnsuccessfulLogin({String? errorDescription})
-      : this.errorDescription = errorDescription ?? kLoginFailed,
+  UnsuccessfulSignup({String? errorDescription})
+      : this.errorDescription = errorDescription ?? _defaultErrorMessage,
         super(
           statusCode: 401,
-          kDefaultMessage: kLoginFailed,
+          kDefaultMessage: _defaultErrorMessage,
         );
 
-  UnsuccessfulLogin copyWith({
+  UnsuccessfulSignup copyWith({
     int? statusCode,
     String? message,
     String? errorDescription,
   }) {
-    return UnsuccessfulLogin(
+    return UnsuccessfulSignup(
       errorDescription: errorDescription ?? this.errorDescription,
     );
   }
@@ -42,22 +42,23 @@ class UnsuccessfulLogin extends AuthResponseBody {
       'error': errorDescription,
     });
 
-  factory UnsuccessfulLogin.fromMap(Map<String, dynamic> map) {
-    return UnsuccessfulLogin(
+  factory UnsuccessfulSignup.fromMap(Map<String, dynamic> map) {
+    return UnsuccessfulSignup(
       errorDescription: map['error'] as String,
     );
   }
 
   String toJson() => prettyJsonEncode(toMap());
 
-  factory UnsuccessfulLogin.fromJson(String source) =>
-      UnsuccessfulLogin.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory UnsuccessfulSignup.fromJson(String source) =>
+      UnsuccessfulSignup.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'UnsuccessfulLogin(errorDescription: $errorDescription)';
+  String toString() =>
+      'UnsuccessfulSignup(errorDescription: $errorDescription)';
 
   @override
-  bool operator ==(covariant UnsuccessfulLogin other) {
+  bool operator ==(covariant UnsuccessfulSignup other) {
     if (identical(this, other)) return true;
 
     return other.errorDescription == errorDescription &&
@@ -88,8 +89,8 @@ class UnsuccessfulLogin extends AuthResponseBody {
   ///     }
   /// }
   /// ```
-  factory UnsuccessfulLogin.fromFirebaseError(Object firebaseError) {
+  factory UnsuccessfulSignup.fromFirebaseError(Object firebaseError) {
     var msg = json.decode(firebaseError.toString())['error']['message'];
-    return UnsuccessfulLogin(errorDescription: msg);
+    return UnsuccessfulSignup(errorDescription: msg);
   }
 }
