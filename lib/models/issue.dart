@@ -39,6 +39,21 @@ class Issue extends Payload {
   @override
   Map<String, dynamic> toMap() {
     try {
+      // var map = <String, dynamic>{};
+
+      // if (uuid != null) map['uuid'] = uuid;
+      // if (creator != null) map['creator'] = creator!.toMap();
+      // if (creationDate != null) map['creationDate'] = creationDate;
+      // if (dueDate != null) map['dueDate'] = dueDate;
+      // if (title != null) map['title'] = title;
+      // if (description != null) map['description'] = description;
+      // if (assignedUsers != null) {
+      //   map['assignedUsers'] = assignedUsers!.map((e) => e.toMap()).toList();
+      // }
+      // if (label != null) map['label'] = label!.toMap();
+
+      // return map;
+
       return <String, dynamic>{
         'uuid': uuid,
         'creator': creator?.toMap(),

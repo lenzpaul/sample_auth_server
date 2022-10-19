@@ -349,106 +349,83 @@ bool verifyJwt(String token) {
 ///
 /// For a DocumentReference, we convert the DocumentReference to a String.
 Map<String, dynamic> mapToFieldValueMap(Map<String, dynamic> map) {
-  List<dynamic> _listToFieldValueMap(List list) {
-    List<dynamic> _list = [];
-
-    for (var item in list) {
-      if (item is Map<String, dynamic>) {
-        _list.add(mapToFieldValueMap(item));
-      } else if (item is List) {
-        _list.add(_listToFieldValueMap(item));
-      } else if (item is DateTime) {
-        _list.add({'timestampValue': item.toUtc().toIso8601String()});
-      } else if (item is Uint8List) {
-        _list.add({'bytesValue': base64Encode(item)});
-      // } else if (item is GeoPoint) {
-      //   _list.add({'geoPointValue': {'latitude': item.latitude, 'longitude': item.longitude}});
-      // } else if (item is DocumentReference) {
-      //   _list.add({'referenceValue': item.path});
-      } else {
-        _list.add(item);
-      }
+  _valueToFieldValueMap(value) {
+    if (value == null) {
+      // return {'nullValue': null};
+      return null;
+    } else if (value is bool) {
+      return {'booleanValue': value};
+    } else if (value is int) {
+      return {'integerValue': value.toString()};
+    } else if (value is double) {
+      return {'doubleValue': value};
+    } else if (value is String) {
+      return {'stringValue': value};
+    } else if (value is DateTime) {
+      return {'timestampValue': value.toUtc().toIso8601String()};
+    } else if (value is Uint8List) {
+      return {'bytesValue': base64Encode(value)};
+      // } else if (value is GeoPoint) {
+      //   return {'geoPointValue': {'latitude': value.latitude, 'longitude': value.longitude}};
+      // } else if (value is DocumentReference) {
+      //   return {'referenceValue': value.path};
+    } else if (value is List) {
+      return {
+        'arrayValue': {'values': value.map(_valueToFieldValueMap).toList()}
+      };
+    } else if (value is Map<String, dynamic>) {
+      return {
+        'mapValue': {'fields': mapToFieldValueMap(value)}
+      };
+    } else {
+      throw Exception(
+          'Unsupported type in mapToFieldValueMap: ${value.runtimeType}');
     }
-
-    // for (var item in list) {
-    //   if (item is Map<String, dynamic>) {
-    //     _list.add(mapToFieldValueMap(item));
-    //   } else if (item is List) {
-    //     _list.add(_listToFieldValueMap(item));
-    //   } else if (item is DateTime) {
-    //     _list.add({'timestampValue': item.toUtc().toIso8601String()});
-    //   } else if (item is Uint8List) {
-    //     _list.add({'bytesValue': base64Encode(item)});
-    //     // } else if (item is GeoPoint) {
-    //     //   _list.add({
-    //     //     'geoPointValue': {
-    //     //       'latitude': item.latitude,
-    //     //       'longitude': item.longitude
-    //     //     }
-    //     //   });
-    //     // } else if (item is DocumentReference) {
-    //     //   _list.add({'referenceValue': item.path});
-    //   } 
-      
-    //   else {
-    //     // int, double, bool, String, null
-    //     _list.add({item.runtimeType.toString().toLowerCase(): item.toString()});
- 
-    //   }
-    }
-
-    return _list;
   }
+
+  // List<dynamic> _listToFieldValueMap(List list) {
+  //   List<dynamic> _list = [];
+  //   for (var item in list) {
+  //     if (item is Map<String, dynamic>) {
+  //       _list.add(mapToFieldValueMap(item));
+  //     } else if (item is List) {
+  //       _list.add(_listToFieldValueMap(item));
+  //     } else if (item is DateTime) {
+  //       _list.add({'timestampValue': item.toUtc().toIso8601String()});
+  //     } else if (item is Uint8List) {
+  //       _list.add({'bytesValue': base64Encode(item)});
+  //       // } else if (item is GeoPoint) {
+  //       //   _list.add({
+  //       //     'geoPointValue': {
+  //       //       'latitude': item.latitude,
+  //       //       'longitude': item.longitude
+  //       //     }
+  //       //   });
+  //       // } else if (item is DocumentReference) {
+  //       //   _list.add({'referenceValue': item.path});
+  //     } else {
+  //       // int, double, bool, String, null
+  //       _list.add({item.runtimeType.toString().toLowerCase(): item.toString()});
+  //     }
+  //   }
+  //   return _list;
+  // }
 
   Map<String, dynamic> fieldValueMap = {};
 
   map.forEach((key, value) {
-    if (value is Map<String, dynamic>) {
-      fieldValueMap[key] = mapToFieldValueMap(value);
-    } else if (value is List) {
-      fieldValueMap[key] = _listToFieldValueMap(value);
-    } else if (value is DateTime) {
-      fieldValueMap[key] = {
-        'timestampValue': value.toUtc().toIso8601String(),
-      };
-    } else if (value is Uint8List) {
-      fieldValueMap[key] = {
-        'bytesValue': base64Encode(value),
-      };
-      // } else if (value is GeoPoint) {
-      //   fieldValueMap[key] = {
-      //     'geoPointValue': {
-      //       'latitude': value.latitude,
-      //       'longitude': value.longitude,
-      //     },
-      //   };
-      // } else if (value is DocumentReference) {
-      //   fieldValueMap[key] = {
-      //     'referenceValue': value.path,
-      //   };
-    } else if (value is double) {
-      fieldValueMap[key] = {
-        'doubleValue': value,
-      };
-    } else if (value is int) {
-      fieldValueMap[key] = {
-        'integerValue': value.toString(),
-      };
-    } else if (value is bool) {
-      fieldValueMap[key] = {
-        'booleanValue': value,
-      };
-    } else if (value is String) {
-      fieldValueMap[key] = {
-        'stringValue': value,
-      };
-    } else if (value == null) {
-      fieldValueMap[key] = {
-        'nullValue': 'NULL_VALUE',
-      };
+    if (value != null) {
+      fieldValueMap[key] = _valueToFieldValueMap(value);
     }
-
   });
+
+  // map.forEach((key, value) {
+  //   if (value is Map<String, dynamic>) {
+  //     fieldValueMap[key] = mapToFieldValueMap(value);
+  //   } else if (value is List) {
+  //     fieldValueMap[key] = _listToFieldValueMap(value);
+  //   } else {}
+  // });
 
   return fieldValueMap;
 }

@@ -32,3 +32,7 @@ class DecodingException implements SerializationException {
     return error;
   }
 }
+
+class InvalidAuthUserException extends DecodingException {
+  InvalidAuthUserException({super.message, super.object});
+}

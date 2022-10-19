@@ -57,13 +57,31 @@ class AuthUser {
   }
 
   factory AuthUser.fromMap(Map<String, dynamic> map) {
-    return AuthUser(
-      uuid: map['uuid'] as String,
-      email: map['email'],
-      username: map['username'],
-      idToken: map['idToken'],
-      isGuest: map['isGuest'],
-    );
+    if (map.isEmpty) {
+      throw InvalidAuthUserException(message: 'Map is empty');
+    }
+
+    if (map['uuid'] == null) {
+      throw InvalidAuthUserException(
+        message: 'Map does not contain a uuid',
+        object: map,
+      );
+    }
+
+    try {
+      return AuthUser(
+        uuid: map['uuid'],
+        email: map['email'],
+        username: map['username'],
+        idToken: map['idToken'],
+        isGuest: map['isGuest'],
+      );
+    } catch (e) {
+      throw InvalidAuthUserException(
+        message: 'Error while creating AuthUser from map',
+        object: map,
+      );
+    }
   }
 
   factory AuthUser.fromJson(String source) =>

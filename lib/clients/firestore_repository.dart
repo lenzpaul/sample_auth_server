@@ -99,14 +99,15 @@ class FirebaseApiRepository {
     // Create the document from the issue.
 
     // Create the issue in Firestore.
-    final result = await _api.projects.databases.documents.patch(
-      Document.fromJson(issueJson),
-      '$_firestoreBaseCollectionPath/issues/$id',
-    );
+    // final result = await _api.projects.databases.documents.patch(
+    //   Document.fromJson(issueJson),
+    //   '$_firestoreBaseCollectionPath/issues/$id',
+    // );
 
     // return DatabaseResponse.successfulRequest(payload: result);
     return shelf.Response.ok(
-      JsonUtf8Encoder(' ').convert(result),
+      JsonUtf8Encoder(' ').convert(issueJson),
+      // JsonUtf8Encoder(' ').convert(result),
       headers: {
         'content-type': 'application/json',
       },
