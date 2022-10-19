@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:markdown/markdown.dart' as md;
+import 'package:sample_auth_server/exceptions/exceptions.dart';
 import 'package:sample_auth_server/models/issue.dart';
 import 'package:sample_auth_server/models/issues.dart';
 import 'package:sample_auth_server/models/responses/responses.dart';
@@ -884,7 +885,7 @@ class FirebaseClient {
   //   } catch (e, st) {
   //     print('Error: $e
 
-  /// Sets up the [Router] and defines the request handlers.
+  /// Sets up the [_router] and defines the request handlers.
   void _setupRouter() {
     this._router = (shelf_router.Router())
       ..post('/login', loginWithEmailAndPasswordHandler)
@@ -893,7 +894,6 @@ class FirebaseClient {
       ..post('/updateProfile', updateProfileHandler)
       ..post('/issues/<issueId>', _firestoreRepository.createIssueHandler)
       ..get('/verifyIdToken', verifyIdTokenHandler)
-      ..get('/db', _firestoreRepository.incrementHandler)
       ..get('/issues', _firestoreRepository.getIssuesHandler)
       ..get('/getProfile', getProfileHandler)
       ..get('/', getReadmeHandler);

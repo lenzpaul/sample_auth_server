@@ -24,22 +24,6 @@ class FirebaseApiRepository {
   /// The Firestore API.
   final FirestoreApi _api;
 
-  Future<shelf.Response> incrementHandler(shelf.Request request) async {
-    var projectId = FirebaseClient.instance.projectId;
-
-    final result = await _api.projects.databases.documents.commit(
-      _incrementRequest(FirebaseClient.instance.projectId),
-      'projects/$projectId/databases/(default)',
-    );
-
-    return shelf.Response.ok(
-      JsonUtf8Encoder(' ').convert(result),
-      headers: {
-        'content-type': 'application/json',
-      },
-    );
-  }
-
   /// GET /issues
   ///
   /// Handler for the GET /issues endpoint. Returns a list of all issues.
@@ -74,39 +58,42 @@ class FirebaseApiRepository {
 
   /// POST /issues/{id}
   ///
-  /// Endpoint to create a new issue.
+  /// This is the handler for the POST /issues/{id} endpoint.
+  ///
+  /// It creates a new issue with the given ID.
   Future<shelf.Response> createIssueHandler(shelf.Request request) async {
-    // The document ID is the last part of the URL path (e.g. "issues/123").
-    //
-    // Here should be the same as the Issues uuid in the request body.
-    final documentId = request.url.pathSegments.last;
-
-    // Get the issue from the request body.
-    Map<String, dynamic> issueAsMap =
-        await request.readAsString().then((value) {
-      return jsonDecode(value);
-      // Issue issue = await request.readAsString().then((value) {
-      // Map<String, dynamic> issueMap = jsonDecode(value);
-      // return Issue.fromMap(issueMap);
-      // return Issue.fromMap(issueAsMap);
-    });
-
-    // Map<String, dynamic> issueAsFields = mapToFieldValueMap(issue.toMap());
-    Map<String, dynamic> issueAsFields = mapToFieldValueMap(issueAsMap);
-
-    // Create the document from the issue.
-    //
-    // Times must be in UTC format for Firestore database.
-    var document = Document.fromJson(
-      {
-        "createTime": DateTime.now().toUtc().toIso8601String(),
-        "updateTime": DateTime.now().toUtc().toIso8601String(),
-        'fields': issueAsFields,
-      },
-    );
-
-    /// Create the issue Document in Firestore database.
     try {
+      // The document ID is the last part of the URL path (e.g. "issues/123").
+      //
+      // Here should be the same as the Issues uuid in the request body.
+      final documentId = request.url.pathSegments.last;
+
+      // Get the issue from the request body.
+      Map<String, dynamic> issueAsMap =
+          await request.readAsString().then((value) {
+        try {
+          return jsonDecode(value);
+        } catch (e) {
+          throw DecodingException(
+            message: 'The request body is not a valid JSON string.',
+          );
+        }
+      });
+
+      Map<String, dynamic> issueAsFields = mapToFieldValueMap(issueAsMap);
+
+      // Create the document from the issue.
+      //
+      // Times must be in UTC format for Firestore database.
+      var document = Document.fromJson(
+        {
+          "createTime": DateTime.now().toUtc().toIso8601String(),
+          "updateTime": DateTime.now().toUtc().toIso8601String(),
+          'fields': issueAsFields,
+        },
+      );
+
+      /// Create the issue Document in Firestore database.
       final Document result =
           await _api.projects.databases.documents.createDocument(
         document,
@@ -122,11 +109,10 @@ class FirebaseApiRepository {
         },
       );
     } catch (e) {
-      return DatabaseResponse.errorRequest(
-        message: 'Error creating issue in Firestore database.',
-        error: e,
+      return DatabaseResponse.unsuccessfulRequest(
+        errorMessage: e.toString(),
+        errorDescription: 'Error creating issue in Firestore database.',
       );
-      // TODO
     }
   }
 
@@ -216,6 +202,7 @@ class FirebaseApiRepository {
       },
     );
   }
+}
 
   /// WIP
   // Future firestoreQuery() async {
@@ -241,21 +228,3 @@ class FirebaseApiRepository {
   //     firebaseAuthClient.close();
   //   }
   // }
-
-  CommitRequest _incrementRequest(String projectId) => CommitRequest(
-        writes: [
-          Write(
-            transform: DocumentTransform(
-              document:
-                  'projects/$projectId/databases/(default)/documents/settings/count',
-              fieldTransforms: [
-                FieldTransform(
-                  fieldPath: 'count',
-                  increment: Value(integerValue: '1'),
-                )
-              ],
-            ),
-          ),
-        ],
-      );
-}

@@ -36,7 +36,6 @@ class Issue extends Payload {
   Map<String, dynamic> toMap() {
     try {
       // var map = <String, dynamic>{};
-
       // if (uuid != null) map['uuid'] = uuid;
       // if (creator != null) map['creator'] = creator!.toMap();
       // if (creationDate != null) map['creationDate'] = creationDate;
@@ -47,7 +46,6 @@ class Issue extends Payload {
       //   map['assignedUsers'] = assignedUsers!.map((e) => e.toMap()).toList();
       // }
       // if (label != null) map['label'] = label!.toMap();
-
       // return map;
 
       return <String, dynamic>{
@@ -62,7 +60,7 @@ class Issue extends Payload {
       };
     } catch (e) {
       var message = 'Error while converting Issue to Map: $e';
-      throw EncodingException(message: message, object: this);
+      throw EncodingException<Issue>(message: message, object: this);
     }
   }
 
@@ -98,7 +96,7 @@ class Issue extends Payload {
       return json.encode(toMap());
     } catch (e) {
       var message = 'Error while converting Issue to JSON: $e';
-      throw EncodingException(message: message, object: this);
+      throw EncodingException<Issue>(message: message, object: this);
     }
   }
 

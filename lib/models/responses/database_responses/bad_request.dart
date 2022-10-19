@@ -6,22 +6,28 @@ import 'package:sample_auth_server/helpers.dart';
 import 'package:sample_auth_server/models/firebase_auth_error.dart';
 import 'package:sample_auth_server/models/responses/response_body.dart';
 
+/// {@template bad_database_request_response_body}
 /// The response body for a failed database request with 400 status code.
+/// {@endtemplate}
 class BadDatabaseRequestResponseBody extends ResponseBody {
   static const String kBadRequest = 'BAD_REQUEST';
   final String errorDescription;
 
-  BadDatabaseRequestResponseBody({String? errorDescription})
-      : this.errorDescription = errorDescription ?? kBadRequest,
+  /// {@macro bad_database_request_response_body}
+  BadDatabaseRequestResponseBody({
+    String? errorMessage,
+    String? errorDescription,
+  })  : this.errorDescription = errorDescription ?? kBadRequest,
         super(
           statusCode: 400,
-          defaultMessage: kBadRequest,
+          defaultMessage: errorMessage ?? kBadRequest,
         );
 
+  /// {@macro bad_database_request_response_body}
   BadDatabaseRequestResponseBody copyWith({
     int? statusCode,
-    String? message,
     String? errorDescription,
+    // String? message,
   }) {
     return BadDatabaseRequestResponseBody(
       errorDescription: errorDescription ?? this.errorDescription,
@@ -41,10 +47,12 @@ class BadDatabaseRequestResponseBody extends ResponseBody {
   @override
   String toJson() => prettyJsonEncode(toMap());
 
+  /// {@macro bad_database_request_response_body}
   factory BadDatabaseRequestResponseBody.fromJson(String source) =>
       BadDatabaseRequestResponseBody.fromMap(
           json.decode(source) as Map<String, dynamic>);
 
+  /// {@macro bad_database_request_response_body}
   factory BadDatabaseRequestResponseBody.fromFirebaseErrorJson(String source) {
     FirebaseAuthError firebaseAuthError = FirebaseAuthError.fromJson(source);
 

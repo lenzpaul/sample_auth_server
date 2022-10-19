@@ -42,9 +42,13 @@ class DatabaseResponse extends shelf.Response {
     );
   }
 
-  factory DatabaseResponse.unsuccessfulRequest(String errorDescription) {
+  factory DatabaseResponse.unsuccessfulRequest({
+    String? errorMessage,
+    String? errorDescription,
+  }) {
     return DatabaseResponse._(
       body: BadDatabaseRequestResponseBody(
+        errorMessage: errorMessage,
         errorDescription: errorDescription,
       ),
       statusCode: 400,
