@@ -9,7 +9,8 @@ import 'package:sample_auth_server/models/responses/payload.dart';
 ///
 /// Includes a method to convert the list of [Issue]s to a [Payload].
 ///
-/// [toJson] the list under the key `issues`.
+/// [toJson] returns a JSON representation of the list of [Issue]s in the
+/// [Payload] object under the `issues` key.
 /// {@endtemplate}
 class Issues extends Payload with ListMixin<Issue> {
   /// {@macro issues}

@@ -1,10 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, unnecessary_this
 import 'dart:convert';
-import 'dart:io';
-
-import 'package:sample_auth_server/helpers.dart';
 import 'package:sample_auth_server/models/models.dart';
-
 import 'package:shelf/shelf.dart' as shelf;
 
 /// A [shelf.Response] sent back to the client. It contains a
@@ -19,8 +15,6 @@ import 'package:shelf/shelf.dart' as shelf;
 /// An unsuccessful login response contains an error message as an `error` key,
 /// see [UnsuccessfulLogin].
 class AuthResponse extends shelf.Response {
-  // AuthResponse._();
-
   /// The body of the response.
   ///
   /// It contains a [AuthResponseBody] which we can call
@@ -87,12 +81,6 @@ class AuthResponse extends shelf.Response {
       statusCode: 401,
     );
   }
-  // : super.unauthorized(
-  //     UnsuccessfulLogin.fromFirebaseError(firebaseErrorResponseBody)
-  //         .toJson(),
-  //     encoding: utf8,
-  //     headers: jsonContentTypeHeader,
-  //   );
 
   /// Bad request, with a 400 status code and details about the error if any.
   factory AuthResponse.badRequest([String? errorDescription]) {

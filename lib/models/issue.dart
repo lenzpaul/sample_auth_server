@@ -1,21 +1,15 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers
-// String? uuid = Uuid().v4();
-// AppUser? creator;
-// DateTime? creationDate;
-// DateTime? dueDate;
-// String? title;
-// String? description;
-// Label? label;
-// List<AppUser>? assignedUsers;
 
 import 'dart:convert';
-
 import 'package:googleapis/firestore/v1.dart';
 import 'package:sample_auth_server/exceptions/exceptions.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
 import 'package:sample_auth_server/models/label.dart';
 import 'package:sample_auth_server/models/responses/payload.dart';
 
+/// {@template issue}
+/// This class is used to represent an issue on the server.
+/// {@endtemplate}
 class Issue extends Payload {
   String? uuid;
   AuthUser? creator;
@@ -25,6 +19,8 @@ class Issue extends Payload {
   String? description;
   List<AuthUser>? assignedUsers;
   Label? label;
+
+  /// {@macro issue}
   Issue({
     this.uuid,
     this.creator,
@@ -70,6 +66,7 @@ class Issue extends Payload {
     }
   }
 
+  /// {@macro issue}
   factory Issue.fromMap(Map<String, dynamic> map) {
     return Issue(
       uuid: map['uuid'] != null ? map['uuid'] as String : null,
@@ -89,13 +86,6 @@ class Issue extends Payload {
           ? List<AuthUser>.from(
               map['assignedUsers'].map((user) => AuthUser.fromMap(user)))
           : null,
-      // assignedUsers: map['assignedUsers'] != null
-      //     ? List<AuthUser>.from(
-      //         (map['assignedUsers'] as List<int>).map<AuthUser?>(
-      //           (x) => AuthUser.fromMap(x as Map<String, dynamic>),
-      //         ),
-      //       )
-      //     : null,
       label: map['label'] != null
           ? Label.fromMap(map['label'] as Map<String, dynamic>)
           : null,
@@ -112,28 +102,34 @@ class Issue extends Payload {
     }
   }
 
+  /// {@macro issue}
   factory Issue.fromJson(String source) =>
       Issue.fromMap(json.decode(source) as Map<String, dynamic>);
 
+  /// {@macro issue}
+  ///
+  /// This method is used to create a new issue from a Firestore [Document].
   factory Issue.fromFirestoreDocument(Map<String, dynamic> map) {
     Issue? issue;
 
     try {
       final fields = map['fields'] as Map<String, dynamic>;
       final _uuid = (map['name'] as String?)?.split('/').last;
-      // title is in format: {stringValue: 'title_of_issue'}, with a single entry.
+
+      // `title` is in format: {stringValue: 'title_of_issue'}, with a single entry.
       final _title = (fields['title'] as Map<String, dynamic>?)
           ?.entries
           .single
           .value as String?;
-      // description is in format: {stringValue: 'description_of_issue'}, with a
+
+      // `description` is in format: {stringValue: 'description_of_issue'}, with a
       // single entry.
       final _description = (fields['description'] as Map<String, dynamic>?)
           ?.entries
           .single
           .value as String?;
 
-      // dueDate is in format: {timestampValue: '2021-08-01T00:00:00.000000Z'},
+      // `dueDate` is in format: {timestampValue: '2021-08-01T00:00:00.000000Z'},
       // with a single entry.
       //
       // Note that we need to convert the timestampValue to a DateTime object.
@@ -153,7 +149,8 @@ class Issue extends Payload {
       final creationDate = creationDateAsString != null
           ? DateTime.tryParse(creationDateAsString)?.toLocal()
           : null;
-      // label is in format:
+
+      // `label` is in format:
       // ```json
       // {
       //    "mapValue":{
@@ -197,7 +194,7 @@ class Issue extends Payload {
           : null;
 
       // `assignedUsers` key is in format:
-
+      //
       // ```json
       // "assignedUsers": {
       //   "arrayValue": {
@@ -272,7 +269,6 @@ class Issue extends Payload {
   /// To firestore [Document]
   ///
   /// Note that we need to convert the [DateTime] object to a [Timestamp] object.
-
   // Map<String, dynamic> toFirestoreFields() {
   //   return {
   //     'title': {'stringValue': title},

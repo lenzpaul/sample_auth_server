@@ -1,25 +1,20 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, unnecessary_this
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:sample_auth_server/helpers.dart';
-import 'package:sample_auth_server/models/models.dart';
 import 'package:sample_auth_server/models/responses/database_responses/bad_request.dart';
 import 'package:sample_auth_server/models/responses/database_responses/succesful_request.dart';
 import 'package:sample_auth_server/models/responses/database_responses/unsuccesful_request.dart';
 import 'package:sample_auth_server/models/responses/payload.dart';
 import 'package:sample_auth_server/models/responses/response_body.dart';
-
 import 'package:shelf/shelf.dart' as shelf;
 
-/// A [shelf.Response] sent back to the client. It contains a
-/// [ResponseBody] in the body.
+/// A [shelf.Response] sent back to the client. It contains a [ResponseBody] as
+/// its body. The [ResponseBody] contains a [Payload]  object, as the `payload`
+/// key. See [SuccessfulRequest], as an example of a [Payload].
 ///
 /// Ther server responds with a 200 status code on successfull request, 401 on
 /// unauthorised request, and 400 on bad request.
 ///
-/// A successful response contains a [Payload] object, as a `payload`
-/// key, see [SuccessfulRequest].
 ///
 /// An unsuccessful login response contains an error message as an `error` key,
 /// see [UnsuccessfulRequest].

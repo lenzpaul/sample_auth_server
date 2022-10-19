@@ -1,33 +1,27 @@
-// Copyright (c) 2021, the Dart project authors. Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
-// import 'dart:convert';
-
-// import 'package:googleapis/firestore/v1.dart';
-// import 'package:sample_auth_server/clients/firebase_auth_client.dart';
-// import 'package:shelf/shelf.dart' as shelf;
-// import 'package:shelf_router/shelf_router.dart' as shelf_router;
-// import 'package:sample_auth_server/helpers.dart';
-// import 'package:http/http.dart' as http;
-
 part of 'firebase_auth_client.dart';
 
+/// {@template firestore_repository}
 /// Wrapper for the Firestore API.
+/// {@endtemplate}
 class FirebaseApiRepository {
   static get _firestoreBaseCollectionPath {
     final projectId = FirebaseClient.instance.projectId;
-
     return 'projects/$projectId/databases/(default)/documents';
   }
 
+  /// {@macro firestore_repository}
   FirebaseApiRepository({required this.firebaseAuthClient})
       : _api = FirestoreApi(firebaseAuthClient.authenticatedClient),
         projectId = firebaseAuthClient.projectId;
 
+  /// The Google Cloud Project ID.
   final String projectId;
 
+  /// An authenticated HTTP client that can be used to make requests to the
+  /// Firestore API.
   final FirebaseClient firebaseAuthClient;
+
+  /// The Firestore API.
   final FirestoreApi _api;
 
   Future<shelf.Response> incrementHandler(shelf.Request request) async {
@@ -46,9 +40,9 @@ class FirebaseApiRepository {
     );
   }
 
-  // GET /issues
-  //
-  // Endpoint to get all issues.
+  /// GET /issues
+  ///
+  /// Handler for the GET /issues endpoint. Returns a list of all issues.
   Future<shelf.Response> getIssuesHandler(shelf.Request request) async {
     Issues issues = Issues();
 
@@ -102,31 +96,38 @@ class FirebaseApiRepository {
 
     // Create the document from the issue.
     //
-    // Times must be in UTC format for Firestore.
+    // Times must be in UTC format for Firestore database.
     var document = Document.fromJson(
       {
         "createTime": DateTime.now().toUtc().toIso8601String(),
         "updateTime": DateTime.now().toUtc().toIso8601String(),
         'fields': issueAsFields,
-        // 'name': '$_firestoreBaseCollectionPath/issues/$id',
       },
     );
 
-    // Create the issue Document in Firestore database.
-    final result = await _api.projects.databases.documents.createDocument(
-      document,
-      '$_firestoreBaseCollectionPath',
-      'issues', // collectionId
-      documentId: documentId,
-    );
+    /// Create the issue Document in Firestore database.
+    try {
+      final Document result =
+          await _api.projects.databases.documents.createDocument(
+        document,
+        '$_firestoreBaseCollectionPath',
+        'issues', // the collectionId
+        documentId: documentId,
+      );
 
-    return shelf.Response.ok(
-      // 'Issue created successfully',
-      JsonUtf8Encoder(' ').convert(result),
-      headers: {
-        'content-type': 'application/json',
-      },
-    );
+      return shelf.Response.ok(
+        JsonUtf8Encoder(' ').convert(result),
+        headers: {
+          'content-type': 'application/json',
+        },
+      );
+    } catch (e) {
+      return DatabaseResponse.errorRequest(
+        message: 'Error creating issue in Firestore database.',
+        error: e,
+      );
+      // TODO
+    }
   }
 
   //
