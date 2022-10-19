@@ -1,8 +1,9 @@
 import 'package:sample_auth_server/helpers.dart';
+import 'package:sample_auth_server/models/models.dart';
 
 /// Body of the [AuthResponse] object.
 ///
-/// Contains a [User] on successful login.
+/// Contains a [AuthUser] on successful login.
 ///
 /// Contains an error message on failed login.
 abstract class AuthResponseBody {

@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:markdown/markdown.dart' as md;
+import 'package:sample_auth_server/models/issues.dart';
 // import 'package:sample_auth_server/clients/firestore_repository.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf_router/shelf_router.dart' as shelf_router;
@@ -187,7 +188,7 @@ class FirebaseAuthClient {
     if (result.statusCode == 200) {
       var body = jsonDecode(result.body);
       var user = AuthUser(
-        uid: body['localId'],
+        uuid: body['localId'],
         isGuest: true, // Logged in anonymously
       );
 
@@ -271,7 +272,7 @@ class FirebaseAuthClient {
 
     var user = AuthUser(
       email: body['email'],
-      uid: body['localId'],
+      uuid: body['localId'],
       isGuest: false,
       username: body['displayName'],
       idToken: body['idToken'],
@@ -429,7 +430,7 @@ class FirebaseAuthClient {
     // Update profile successful. Return the user's data.
     return AuthResponse.signUpSuccesful(
       AuthUser(
-        uid: uid,
+        uuid: uid,
         email: email,
         username: username,
         isGuest: false,

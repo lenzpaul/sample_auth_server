@@ -1,0 +1,36 @@
+{
+    "uuid": "123",
+    "creator": {
+        "uid": "123",
+        "email": "a@a.ca",
+        "username": "a",
+        "idToken": "123",
+        "isGuest": false
+    },
+    "creationDate": 1666136454330,
+    "dueDate": 1666136454330,
+    "title": "title",
+    "description": "description",
+    "assignedUsers": [
+        {
+            "uid": "123",
+            "email": "a@a.ca",
+            "username": "a",
+            "idToken": "123",
+            "isGuest": false
+        },
+        {
+            "uid": "123",
+            "email": "a@a.ca",
+            "username": "a",
+            "idToken": "123",
+            "isGuest": false
+        }
+    ],
+    "label": {
+        "uuid": "123",
+        "name": "name",
+        "description": "description",
+        "color": "red"
+    }
+}

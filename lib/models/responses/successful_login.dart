@@ -46,6 +46,7 @@ class SuccessfulLogin extends AuthResponseBody {
     );
   }
 
+  @override
   String toJson() => prettyJsonEncode(toMap());
 
   factory SuccessfulLogin.fromJson(String source) =>

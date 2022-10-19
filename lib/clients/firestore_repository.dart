@@ -48,10 +48,28 @@ class FirebaseApiRepository {
 
   // get issues endpoint
   Future<shelf.Response> getIssuesHandler(shelf.Request request) async {
-    final result = await _api.projects.databases.documents.list(
+    List<Issue> issues = [];
+
+    // Get the issues from Firestore.
+    final ListDocumentsResponse result =
+        await _api.projects.databases.documents.list(
       _firestoreBaseCollectionPath,
       'issues',
     );
+
+    // Convert the Firestore documents to Issues.
+    for (Document doc in result.documents!) {
+      // issues.add(Issue.fromMap(doc.fields!));
+
+      if (doc.fields != null) {
+        // issues2.add(Issue.fromFirestoreDocument(doc.fields!));
+        var js = doc.toJson(); // convert to json
+        var js2 = jsonEncode(js); // convert to string
+        var js3 = jsonDecode(js2); // convert to map
+        issues.add(Issue.fromFirestoreDocument(js3));
+        // issues2.add(Issue.fromFirestoreDocument(js));
+      }
+    }
 
     return shelf.Response.ok(
       JsonUtf8Encoder(' ').convert(result),
