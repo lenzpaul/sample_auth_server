@@ -82,32 +82,47 @@ class FirebaseApiRepository {
   ///
   /// Endpoint to create a new issue.
   Future<shelf.Response> createIssueHandler(shelf.Request request) async {
-    print(request.url.pathSegments);
-
-    final id = request.url.pathSegments.last;
+    // The document ID is the last part of the URL path (e.g. "issues/123").
+    //
+    // Here should be the same as the Issues uuid in the request body.
+    final documentId = request.url.pathSegments.last;
 
     // Get the issue from the request body.
-    Issue issue = await request.readAsString().then((value) {
-      Map<String, dynamic> issueMap = jsonDecode(value);
-      return Issue.fromMap(issueMap);
+    Map<String, dynamic> issueAsMap =
+        await request.readAsString().then((value) {
+      return jsonDecode(value);
+      // Issue issue = await request.readAsString().then((value) {
+      // Map<String, dynamic> issueMap = jsonDecode(value);
+      // return Issue.fromMap(issueMap);
+      // return Issue.fromMap(issueAsMap);
     });
 
-    var issueAsFields = mapToFieldValueMap(issue.toMap());
-
-    var issueJson = issue.toMap();
+    // Map<String, dynamic> issueAsFields = mapToFieldValueMap(issue.toMap());
+    Map<String, dynamic> issueAsFields = mapToFieldValueMap(issueAsMap);
 
     // Create the document from the issue.
+    //
+    // Times must be in UTC format for Firestore.
+    var document = Document.fromJson(
+      {
+        "createTime": DateTime.now().toUtc().toIso8601String(),
+        "updateTime": DateTime.now().toUtc().toIso8601String(),
+        'fields': issueAsFields,
+        // 'name': '$_firestoreBaseCollectionPath/issues/$id',
+      },
+    );
 
-    // Create the issue in Firestore.
-    // final result = await _api.projects.databases.documents.patch(
-    //   Document.fromJson(issueJson),
-    //   '$_firestoreBaseCollectionPath/issues/$id',
-    // );
+    // Create the issue Document in Firestore database.
+    final result = await _api.projects.databases.documents.createDocument(
+      document,
+      '$_firestoreBaseCollectionPath',
+      'issues', // collectionId
+      documentId: documentId,
+    );
 
-    // return DatabaseResponse.successfulRequest(payload: result);
     return shelf.Response.ok(
-      JsonUtf8Encoder(' ').convert(issueJson),
-      // JsonUtf8Encoder(' ').convert(result),
+      // 'Issue created successfully',
+      JsonUtf8Encoder(' ').convert(result),
       headers: {
         'content-type': 'application/json',
       },

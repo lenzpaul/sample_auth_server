@@ -57,8 +57,8 @@ class Issue extends Payload {
       return <String, dynamic>{
         'uuid': uuid,
         'creator': creator?.toMap(),
-        'creationDate': creationDate?.millisecondsSinceEpoch,
-        'dueDate': dueDate?.millisecondsSinceEpoch,
+        'creationDate': creationDate?.toUtc().toIso8601String(),
+        'dueDate': dueDate?.toUtc().toIso8601String(),
         'title': title,
         'description': description,
         'assignedUsers': assignedUsers?.map((x) => x.toMap()).toList(),
@@ -77,10 +77,10 @@ class Issue extends Payload {
           ? AuthUser.fromMap(map['creator'] as Map<String, dynamic>)
           : null,
       creationDate: map['creationDate'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['creationDate'] as int)
+          ? DateTime.tryParse(map['creationDate'] as String)?.toLocal()
           : null,
       dueDate: map['dueDate'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['dueDate'] as int)
+          ? DateTime.tryParse(map['dueDate'] as String)?.toLocal()
           : null,
       title: map['title'] != null ? map['title'] as String : null,
       description:
@@ -137,14 +137,13 @@ class Issue extends Payload {
       // with a single entry.
       //
       // Note that we need to convert the timestampValue to a DateTime object.
-      // final _dueDateAsDateTime = _dueDate != null ? DateTime.parse(_dueDate) : null;
-
       final _dueDateAsString = (fields['dueDate'] as Map<String, dynamic>?)
           ?.entries
           .single
           .value as String?;
-      final _dueDate =
-          _dueDateAsString != null ? DateTime.parse(_dueDateAsString) : null;
+      final _dueDate = _dueDateAsString != null
+          ? DateTime.tryParse(_dueDateAsString)?.toLocal()
+          : null;
 
       final creationDateAsString =
           (fields['creationDate'] as Map<String, dynamic>?)
@@ -152,7 +151,7 @@ class Issue extends Payload {
               .single
               .value as String?;
       final creationDate = creationDateAsString != null
-          ? DateTime.parse(creationDateAsString)
+          ? DateTime.tryParse(creationDateAsString)?.toLocal()
           : null;
       // label is in format:
       // ```json

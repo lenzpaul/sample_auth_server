@@ -144,11 +144,11 @@ class AuthUser {
 
     try {
       user = AuthUser(
-        uuid: fields['uuid']['stringValue'] as String,
-        email: fields['email']['stringValue'],
-        username: fields['username']['stringValue'],
-        isGuest: fields['isGuest']['booleanValue'],
-        idToken: getIDToken ? fields['idToken']['stringValue'] : null,
+        uuid: fields['uuid']?['stringValue'] as String,
+        email: fields['email']?['stringValue'],
+        username: fields['username']?['stringValue'],
+        isGuest: fields['isGuest']?['booleanValue'],
+        idToken: getIDToken ? (fields['idToken']?['stringValue']) : null,
       );
     } catch (e) {
       var exception = DecodingException(
