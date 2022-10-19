@@ -35,16 +35,21 @@ class Issue {
   });
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'uuid': uuid,
-      'creator': creator?.toMap(),
-      'creationDate': creationDate?.millisecondsSinceEpoch,
-      'dueDate': dueDate?.millisecondsSinceEpoch,
-      'title': title,
-      'description': description,
-      'assignedUsers': assignedUsers?.map((x) => x.toMap()).toList(),
-      'label': label?.toMap(),
-    };
+    try {
+      return <String, dynamic>{
+        'uuid': uuid,
+        'creator': creator?.toMap(),
+        'creationDate': creationDate?.toString(),
+        'dueDate': dueDate?.millisecondsSinceEpoch,
+        'title': title,
+        'description': description,
+        'assignedUsers': assignedUsers?.map((x) => x.toMap()).toList(),
+        'label': label?.toMap(),
+      };
+    } catch (e) {
+      var message = 'Error while converting Issue to Map: $e';
+      throw EncodingException(message: message, object: this);
+    }
   }
 
   factory Issue.fromMap(Map<String, dynamic> map) {
@@ -75,7 +80,14 @@ class Issue {
     );
   }
 
-  String toJson() => json.encode(toMap());
+  String toJson() {
+    try {
+      return json.encode(toMap());
+    } catch (e) {
+      var message = 'Error while converting Issue to JSON: $e';
+      throw EncodingException(message: message, object: this);
+    }
+  }
 
   factory Issue.fromJson(String source) =>
       Issue.fromMap(json.decode(source) as Map<String, dynamic>);

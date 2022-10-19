@@ -62,17 +62,25 @@ class FirebaseApiRepository {
       // issues.add(Issue.fromMap(doc.fields!));
 
       if (doc.fields != null) {
-        // issues2.add(Issue.fromFirestoreDocument(doc.fields!));
-        var js = doc.toJson(); // convert to json
-        var js2 = jsonEncode(js); // convert to string
-        var js3 = jsonDecode(js2); // convert to map
-        issues.add(Issue.fromFirestoreDocument(js3));
-        // issues2.add(Issue.fromFirestoreDocument(js));
+        // This block is to convert the Document to a Map<String, dynamic> in
+        // JSON format, instead of a Map<String, Value>.
+        var docAsJson = doc.toJson(); // convert to Map<String, dynamic>
+        var docAsString = jsonEncode(docAsJson); // convert to JSON string
+        var docAsMap =
+            jsonDecode(docAsString); // convert to Map<String, dynamic>
+
+        issues.add(Issue.fromFirestoreDocument(docAsMap));
       }
     }
 
+    String _issuesToJson(List<Issue> issues) {
+      var issuesAsJson = issues.map((issue) => issue.toJson()).toList();
+      return jsonEncode(issuesAsJson);
+    }
+
     return shelf.Response.ok(
-      JsonUtf8Encoder(' ').convert(result),
+      _issuesToJson(issues),
+      // JsonUtf8Encoder(' ').convert(issuesAsJson),
       headers: {
         'content-type': 'application/json',
       },
