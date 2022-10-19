@@ -48,7 +48,7 @@ class FirebaseApiRepository {
 
   // get issues endpoint
   Future<shelf.Response> getIssuesHandler(shelf.Request request) async {
-    List<Issue> issues = [];
+    Issues issues = Issues();
 
     // Get the issues from Firestore.
     final ListDocumentsResponse result =
@@ -73,18 +73,12 @@ class FirebaseApiRepository {
       }
     }
 
-    String _issuesToJson(List<Issue> issues) {
-      var issuesAsJson = issues.map((issue) => issue.toJson()).toList();
-      return jsonEncode(issuesAsJson);
-    }
+    // String _issuesToJson(List<Issue> issues) {
+    //   var issuesAsJson = issues.map((issue) => issue.toJson()).toList();
+    //   return jsonEncode(issuesAsJson);
+    // }
 
-    return shelf.Response.ok(
-      _issuesToJson(issues),
-      // JsonUtf8Encoder(' ').convert(issuesAsJson),
-      headers: {
-        'content-type': 'application/json',
-      },
-    );
+    return DatabaseResponse.successfulRequest(payload: issues);
   }
 
   // WIP: Finish this method

@@ -3,26 +3,27 @@
 import 'dart:convert';
 
 import 'package:sample_auth_server/helpers.dart';
-import 'package:sample_auth_server/models/responses/auth_responses/auth_response_body.dart';
 import 'package:sample_auth_server/models/firebase_auth_error.dart';
+import 'package:sample_auth_server/models/responses/response_body.dart';
 
-class BadRequestResponseBody extends AuthResponseBody {
+/// The response body for a failed database request with 400 status code.
+class BadDatabaseRequestResponseBody extends ResponseBody {
   static const String kBadRequest = 'BAD_REQUEST';
   final String errorDescription;
 
-  BadRequestResponseBody({String? errorDescription})
+  BadDatabaseRequestResponseBody({String? errorDescription})
       : this.errorDescription = errorDescription ?? kBadRequest,
         super(
           statusCode: 400,
           defaultMessage: kBadRequest,
         );
 
-  BadRequestResponseBody copyWith({
+  BadDatabaseRequestResponseBody copyWith({
     int? statusCode,
     String? message,
     String? errorDescription,
   }) {
-    return BadRequestResponseBody(
+    return BadDatabaseRequestResponseBody(
       errorDescription: errorDescription ?? this.errorDescription,
     );
   }
@@ -31,25 +32,26 @@ class BadRequestResponseBody extends AuthResponseBody {
   Map<String, dynamic> toMap() =>
       super.toMap()..addAll({'error': errorDescription});
 
-  factory BadRequestResponseBody.fromMap(Map<String, dynamic> map) {
-    return BadRequestResponseBody(
+  factory BadDatabaseRequestResponseBody.fromMap(Map<String, dynamic> map) {
+    return BadDatabaseRequestResponseBody(
       errorDescription: map['error'] as String,
     );
   }
 
+  @override
   String toJson() => prettyJsonEncode(toMap());
 
-  factory BadRequestResponseBody.fromJson(String source) =>
-      BadRequestResponseBody.fromMap(
+  factory BadDatabaseRequestResponseBody.fromJson(String source) =>
+      BadDatabaseRequestResponseBody.fromMap(
           json.decode(source) as Map<String, dynamic>);
 
-  factory BadRequestResponseBody.fromFirebaseErrorJson(String source) {
+  factory BadDatabaseRequestResponseBody.fromFirebaseErrorJson(String source) {
     FirebaseAuthError firebaseAuthError = FirebaseAuthError.fromJson(source);
 
     var errorMsg = firebaseAuthError.message;
-    if (errorMsg == null) return BadRequestResponseBody();
+    if (errorMsg == null) return BadDatabaseRequestResponseBody();
 
-    return BadRequestResponseBody(
+    return BadDatabaseRequestResponseBody(
       errorDescription: errorMsg,
     );
   }
@@ -59,7 +61,7 @@ class BadRequestResponseBody extends AuthResponseBody {
       '${runtimeType.toString}(errorDescription: $errorDescription)';
 
   @override
-  bool operator ==(covariant BadRequestResponseBody other) {
+  bool operator ==(covariant BadDatabaseRequestResponseBody other) {
     if (identical(this, other)) return true;
 
     return other.errorDescription == errorDescription &&

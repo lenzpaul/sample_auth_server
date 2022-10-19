@@ -1,109 +1,59 @@
 {
-    "createTime": "2022-10-17T16:31:57.812426Z",
-    "fields": {
-        "dueDate": {
-            "timestampValue": "2022-10-19T21:00:00.771Z"
-        },
-        "label": {
-            "mapValue": {
-                "fields": {
-                    "name": {
-                        "stringValue": "urgent"
-                    },
-                    "uuid": {
-                        "stringValue": "123456A"
-                    },
-                    "description": {
-                        "stringValue": "issues that are urgent"
-                    },
-                    "color": {
-                        "stringValue": "EB4034"
-                    }
-                }
-            }
-        },
-        "assignedUsers": {
-            "arrayValue": {
-                "values": [
-                    {
-                        "mapValue": {
-                            "fields": {
-                                "idToken": {
-                                    "stringValue": "12345"
-                                },
-                                "email": {
-                                    "stringValue": "a@a.ca"
-                                },
-                                "username": {
-                                    "stringValue": "allo"
-                                },
-                                "sample_null_value": {
-                                    "nullValue": "NULL_VALUE"
-                                },
-                                "uid": {
-                                    "stringValue": "123"
-                                },
-                                "isGuest": {
-                                    "booleanValue": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "mapValue": {
-                            "fields": {
-                                "uuid": {
-                                    "stringValue": "123aj"
-                                },
-                                "username": {
-                                    "stringValue": "abcd"
-                                },
-                                "idToken": {
-                                    "stringValue": "123qq"
-                                },
-                                "email": {
-                                    "stringValue": "email@email.ca"
-                                },
-                                "isGuest": {
-                                    "booleanValue": true
-                                }
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        "creator": {
-            "mapValue": {
-                "fields": {
-                    "idToken": {
-                        "stringValue": "creator_id_token"
-                    },
-                    "username": {
-                        "stringValue": "creator_username"
-                    },
-                    "uuid": {
-                        "stringValue": "creator_uuid"
-                    },
-                    "email": {
-                        "stringValue": "creator_email@a.ca"
-                    },
-                    "isGuest": {
-                        "booleanValue": true
-                    }
-                }
-            }
-        },
-        "creationDate": {
-            "timestampValue": "2022-10-19T00:45:00.386Z"
-        },
-        "title": {
-            "stringValue": "test1234"
-        },
-        "description": {
-            "stringValue": "random description about kadjskakld jasljdkla sjdl jaskl ldl dljaslld ajdkl  adlkjkjakjjaoiu do sp fsoi ufpu fu ospid ufu dsof sisf isiuou sfo sd"
-        }
-    },
     "name": "projects/cmic-sample-issue-tracker/databases/(default)/documents/issues/bmCFVKoDYNzL7Y7f5hDd",
-    "updateTime": "2022-10-19T00:50:32.405232Z"
-}
+    "fields": {
+      "assignedUsers": {
+        "arrayValue": {
+          "values": [
+            {
+              "mapValue": {
+                "fields": {
+                  "email": {
+                    "stringValue": "a@a.ca"
+                  },
+                  "isGuest": {
+                    "booleanValue": false
+                  },
+                  "username": {
+                    "stringValue": "allo"
+                  },
+                  "uid": {
+                    "stringValue": "123"
+                  },
+                  "sample_null_value": {
+                    "nullValue": null
+                  },
+                  "idToken": {
+                    "stringValue": "12345"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "title": {
+        "stringValue": "test1234"
+      },
+      "label": {
+        "mapValue": {
+          "fields": {
+            "description": {
+              "stringValue": "issues that are urgent"
+            },
+            "color": {
+              "stringValue": "EB4034"
+            },
+            "name": {
+              "stringValue": "urgent"
+            },
+            "uuid": {
+              "stringValue": "123456A"
+            }
+          }
+        }
+      }
+    },
+    "createTime": "2022-10-17T16:31:57.812426Z",
+    "updateTime": "2022-10-18T23:57:48.973581Z"
+  }
+  
