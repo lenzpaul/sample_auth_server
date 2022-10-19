@@ -7,7 +7,8 @@ import 'package:sample_auth_server/models/models.dart';
 
 import 'package:shelf/shelf.dart' as shelf;
 
-/// Response sent back to the client. It contains a [AuthResponseBody].
+/// A [shelf.Response] sent back to the client. It contains a
+/// [AuthResponseBody] in the body.
 ///
 /// Ther server responds with a 200 status code on successfull login. On an
 /// unsuccessful login, the server responds with a 401.

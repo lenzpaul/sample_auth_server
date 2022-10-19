@@ -3,7 +3,7 @@
 import 'dart:convert';
 
 import 'package:sample_auth_server/helpers.dart';
-import 'package:sample_auth_server/models/responses/auth_response_body.dart';
+import 'package:sample_auth_server/models/responses/auth_responses/auth_response_body.dart';
 import 'package:sample_auth_server/models/firebase_auth_error.dart';
 
 class BadRequestResponseBody extends AuthResponseBody {
@@ -14,7 +14,7 @@ class BadRequestResponseBody extends AuthResponseBody {
       : this.errorDescription = errorDescription ?? kBadRequest,
         super(
           statusCode: 400,
-          kDefaultMessage: kBadRequest,
+          defaultMessage: kBadRequest,
         );
 
   BadRequestResponseBody copyWith({
@@ -56,7 +56,7 @@ class BadRequestResponseBody extends AuthResponseBody {
 
   @override
   String toString() =>
-      'BadRequestResponseBody(errorDescription: $errorDescription)';
+      '${runtimeType.toString}(errorDescription: $errorDescription)';
 
   @override
   bool operator ==(covariant BadRequestResponseBody other) {
@@ -64,12 +64,10 @@ class BadRequestResponseBody extends AuthResponseBody {
 
     return other.errorDescription == errorDescription &&
         other.statusCode == statusCode &&
-        other.kDefaultMessage == kDefaultMessage;
+        other.defaultMessage == defaultMessage;
   }
 
   @override
   int get hashCode =>
-      errorDescription.hashCode ^
-      statusCode.hashCode ^
-      kDefaultMessage.hashCode;
+      errorDescription.hashCode ^ statusCode.hashCode ^ defaultMessage.hashCode;
 }

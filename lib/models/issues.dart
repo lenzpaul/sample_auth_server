@@ -13,8 +13,9 @@ import 'dart:convert';
 import 'package:sample_auth_server/exceptions/exceptions.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
 import 'package:sample_auth_server/models/label.dart';
+import 'package:sample_auth_server/models/responses/payload.dart';
 
-class Issue {
+class Issue extends Payload {
   String? uuid;
   AuthUser? creator;
   DateTime? creationDate;
@@ -34,6 +35,7 @@ class Issue {
     this.label,
   });
 
+  @override
   Map<String, dynamic> toMap() {
     try {
       return <String, dynamic>{
@@ -80,6 +82,7 @@ class Issue {
     );
   }
 
+  @override
   String toJson() {
     try {
       return json.encode(toMap());

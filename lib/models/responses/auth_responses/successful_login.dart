@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:sample_auth_server/helpers.dart';
-import 'package:sample_auth_server/models/responses/auth_response_body.dart';
+import 'package:sample_auth_server/models/responses/auth_responses/auth_response_body.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
 
 /// {@template successful_login}
@@ -30,7 +30,7 @@ class SuccessfulLogin extends AuthResponseBody {
   SuccessfulLogin({
     String message = 'LOGIN_SUCCESS',
     required this.userData,
-  }) : super(statusCode: 200, kDefaultMessage: message);
+  }) : super(statusCode: 200, defaultMessage: message);
 
   @override
   Map<String, dynamic> toMap() => super.toMap()
