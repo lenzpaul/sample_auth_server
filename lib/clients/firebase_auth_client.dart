@@ -759,9 +759,120 @@ class FirebaseClient {
       readmeHtml,
       headers: {'Content-Type': 'text/html'},
     );
-
-    // return shelf.Response.ok(readme);
   }
+
+  /// POST /issues/{issueId}
+  ///
+  /// Creates a new issue.
+  ///
+  // Future<shelf.Response> createIssueHandler(shelf.Request request) async {
+  //   var authorizationHeader = request.headers['authorization'];
+
+  //   // Authorization header is missing.
+  //   if (authorizationHeader == null) {
+  //     return AuthResponse.badRequest('Authorization header is missing');
+  //   }
+
+  //   // Check authorization header for the Bearer token.
+  //   var authType = authorizationHeader.split(' ')[0];
+
+  //   // Bearer token is missing. Unsupported authentication type provided.
+  //   if (authType != 'Bearer') {
+  //     return shelf.Response.badRequest(
+  //       body: prettyJsonEncode(
+  //         {
+  //           'code': 400,
+  //           'message':
+  //               'Unsupported authentication type. Only Bearer Auth is supported '
+  //                   'with idToken for this endpoint.',
+  //         },
+  //       ),
+  //     );
+  //   }
+
+  //   // The authorization type is Bearer. Get the idToken.
+  //   var idToken = authorizationHeader.split(' ')[1];
+
+  //   // Check if the token is valid.
+  //   bool tokenIsValid = verifyJwt(idToken);
+
+  //   if (!tokenIsValid) {
+  //     // Token is invalid.
+  //     return shelf.Response.unauthorized(
+  //       prettyJsonEncode(
+  //         {
+  //           'code': 401,
+  //           'message': 'TOKEN_INVALID',
+  //         },
+  //       ),
+  //     );
+  //   }
+
+  //   // Token is valid. Get the user's profile.
+  //   final result = await _authenticatedClient.post(
+  //     Uri.parse(getUserDataUrl),
+  //     body: {'idToken': idToken},
+  //   );
+
+  //   // Get profile not successful.
+  //   if (result.statusCode != 200) {
+  //     shelf.Response.internalServerError(
+  //       body: prettyJsonEncode(
+  //         {
+  //           'code': 500,
+  //           'message': 'GET_PROFILE_FAILED',
+  //         },
+  //       ),
+  //     );
+  //   }
+
+  //   // Get profile successful.
+  //   var userData =
+  //       AuthUser.fromFirebaseGetProfileResponse(jsonDecode(result.body));
+
+  //   // Get the request body.
+  //   var clientReqBody = await request.readAsString();
+  //   var clientReqBodyMap = jsonDecode(clientReqBody);
+
+  //   // Prepare the request body for the Firebase API.
+  //   var serverReqBody = {
+  //     'idToken': idToken,
+  //     'title': clientReqBodyMap['title'],
+  //     'description': clientReqBodyMap['description'],
+  //     'author': userData.displayName,
+  //     'authorPhotoUrl': userData.photoUrl,
+  //     'authorUid': userData.uid,
+  //     'createdAt': DateTime.now().toIso8601String(),
+  //   };
+
+  //   // Create the issue.
+  //   final create = await _authenticatedClient.post(
+  //     Uri.parse(createIssueUrl),
+  //     body: serverReqBody,
+  //   );
+
+  //   // Create issue not successful.
+  //   if (create.statusCode != 200) {
+  //     shelf.Response.internalServerError(
+  //       body: prettyJsonEncode(
+  //         {
+  //           'code': 500,
+  //           'message': 'CREATE_ISSUE_FAILED',
+  //         },
+  //       ),
+  //     );
+  //   }
+
+  //   // Create issue successful.
+  //   return shelf.Response.ok(
+  //     prettyJsonEncode(
+  //       {
+  //         'code': 200,
+  //         'message': 'ISSUE_CREATED',
+  //       },
+  //     ),
+  //   );
+  // }
 
   /// Calls another handler function and returns the response.
   // Future<shelf.Response> _callHandler(
@@ -782,6 +893,7 @@ class FirebaseClient {
       ..post('/loginAnonymously', loginAnonymouslyHandler)
       ..post('/signup', signUpWithEmailAndPasswordHandler)
       ..post('/updateProfile', updateProfileHandler)
+      ..post('/issues/<issueId>', _firestoreRepository.createIssueHandler)
       ..get('/verifyIdToken', verifyIdTokenHandler)
       ..get('/db', _firestoreRepository.incrementHandler)
       ..get('/issues', _firestoreRepository.getIssuesHandler)
@@ -789,3 +901,5 @@ class FirebaseClient {
       ..get('/', getReadmeHandler);
   }
 }
+
+// issues/539cb0d1-21b6-4a3b-9a5a-6af699b4ac95

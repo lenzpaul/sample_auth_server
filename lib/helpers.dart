@@ -2,10 +2,12 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 // ignore_for_file: no_leading_underscores_for_local_identifiers
+import 'package:googleapis/firestore/v1.dart';
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -257,4 +259,196 @@ bool verifyJwt(String token) {
   }
 
   return tokenIsValid;
+}
+
+/// [enhancement]: Does not handl GeoPoint and DocumentReference types right
+/// now.
+///
+/// Map<String, dynamic> to Firestore FieldValue Map.
+///
+/// See: https://firebase.google.com/docs/firestore/reference/rest/v1/Value
+///
+/// To write a map to Firestore, we need to convert the map to a Firestore
+/// FieldValue Map. Each value in the map must be a Map with a single key and
+/// value. The key is the Firestore FieldValue type and the value is the value
+/// to write to Firestore.
+///
+/// Example:
+///
+/// ```
+/// {
+///   'sample_null_value' : {"nullValue": null},
+///   'isBool': {"booleanValue": false},
+///   'age' : {"integerValue": '42'},
+///   'cost': {"doubleValue": 42.42},
+///   'name': {"stringValue": 'John Doe'},
+///
+///   // A timestamp in RFC3339 UTC "Zulu" format
+///   'created_at': {"timestampValue": '2021-03-01T00:00:00.000Z'},
+///
+///   // Bytes must be encoded in base64
+///   'image': {"bytesValue": base64Encode(imageBytes)},
+///
+///   referenceValue: A reference to a document.
+///   {
+///     "referenceValue":
+///     "projects/{project_id}/databases/{databaseId}/documents/{document_path}"
+///   },
+///
+///
+///   {"geoPointValue": {latitude: number, longitude: number}},
+///
+///   // An array value. Cannot directly contain another array value.
+///   {"arrayValue": {values: [Value, ...]}}
+///
+///  // mapValue
+///  {"mapValue": {fields: {fieldName: Value, ...}}}
+/// }
+/// ```
+///
+/// To convert a Map<String, dynamic> to a Firestore FieldValue Map, we
+/// recursively iterate through the map and convert each value to a Firestore
+/// FieldValue Map, by prepending the value with the Firestore FieldValue type.
+///
+/// Example:
+///
+/// - `{ 'name': 'John Doe' }` becomes `{ 'name': { 'stringValue': 'John Doe' }
+///   }`
+/// - `{ 'age': 42 }` becomes `{ 'age': { 'integerValue': '42' } }`
+/// - `{ 'cost': 42.42 }` becomes `{ 'cost': { 'doubleValue': 42.42 } }`
+/// - `{ 'isBool': false }` becomes `{ 'isBool': { 'booleanValue': false } }`
+/// - `{ 'created_at': DateTime.now() }` becomes `{ 'created_at': {
+///   'timestampValue': '2021-03-01T00:00:00.000Z' } }`
+/// - `{ 'image': base64Encode(imageBytes) }` becomes `{ 'image': {
+///   'bytesValue': base64Encode(imageBytes) } }`
+/// - `{ 'referenceValue':
+///   'projects/{project_id}/databases/{databaseId}/documents/{document_path}'
+///   }` becomes `{ 'referenceValue': { 'referenceValue':
+///   'projects/{project_id}/databases/{databaseId}/documents/{document_path}' }
+///   }`
+/// - `{ 'geoPointValue': {latitude: number, longitude: number} }` becomes `{
+///   'geoPointValue': { 'geoPointValue': {latitude: number, longitude: number}
+///   } }`
+/// - `{ 'arrayValue': [Value, ...] }` becomes `{ 'arrayValue': { 'arrayValue':
+///   [Value, ...] } }`
+/// - `{ 'mapValue': {fields: {fieldName: Value, ...}} }` becomes `{ 'mapValue':
+///   { 'mapValue': {fields: {fieldName: Value, ...}} } }`
+///
+/// For an Object, we convert the object to a Map<String, dynamic> and then
+/// recursively convert the Map<String, dynamic> to a Firestore FieldValue Map.
+///
+/// For a List, we recursively convert each item in the list to a Firestore
+/// FieldValue Map.
+///
+/// For a DateTime, we convert the DateTime to a String in RFC3339 UTC "Zulu"
+/// format.
+///
+/// For a Uint8List, we convert the Uint8List to a base64 encoded String.
+///
+/// For a GeoPoint, we convert the GeoPoint to a Map<String, dynamic> with
+///
+/// For a DocumentReference, we convert the DocumentReference to a String.
+Map<String, dynamic> mapToFieldValueMap(Map<String, dynamic> map) {
+  List<dynamic> _listToFieldValueMap(List list) {
+    List<dynamic> _list = [];
+
+    for (var item in list) {
+      if (item is Map<String, dynamic>) {
+        _list.add(mapToFieldValueMap(item));
+      } else if (item is List) {
+        _list.add(_listToFieldValueMap(item));
+      } else if (item is DateTime) {
+        _list.add({'timestampValue': item.toUtc().toIso8601String()});
+      } else if (item is Uint8List) {
+        _list.add({'bytesValue': base64Encode(item)});
+      // } else if (item is GeoPoint) {
+      //   _list.add({'geoPointValue': {'latitude': item.latitude, 'longitude': item.longitude}});
+      // } else if (item is DocumentReference) {
+      //   _list.add({'referenceValue': item.path});
+      } else {
+        _list.add(item);
+      }
+    }
+
+    // for (var item in list) {
+    //   if (item is Map<String, dynamic>) {
+    //     _list.add(mapToFieldValueMap(item));
+    //   } else if (item is List) {
+    //     _list.add(_listToFieldValueMap(item));
+    //   } else if (item is DateTime) {
+    //     _list.add({'timestampValue': item.toUtc().toIso8601String()});
+    //   } else if (item is Uint8List) {
+    //     _list.add({'bytesValue': base64Encode(item)});
+    //     // } else if (item is GeoPoint) {
+    //     //   _list.add({
+    //     //     'geoPointValue': {
+    //     //       'latitude': item.latitude,
+    //     //       'longitude': item.longitude
+    //     //     }
+    //     //   });
+    //     // } else if (item is DocumentReference) {
+    //     //   _list.add({'referenceValue': item.path});
+    //   } 
+      
+    //   else {
+    //     // int, double, bool, String, null
+    //     _list.add({item.runtimeType.toString().toLowerCase(): item.toString()});
+ 
+    //   }
+    }
+
+    return _list;
+  }
+
+  Map<String, dynamic> fieldValueMap = {};
+
+  map.forEach((key, value) {
+    if (value is Map<String, dynamic>) {
+      fieldValueMap[key] = mapToFieldValueMap(value);
+    } else if (value is List) {
+      fieldValueMap[key] = _listToFieldValueMap(value);
+    } else if (value is DateTime) {
+      fieldValueMap[key] = {
+        'timestampValue': value.toUtc().toIso8601String(),
+      };
+    } else if (value is Uint8List) {
+      fieldValueMap[key] = {
+        'bytesValue': base64Encode(value),
+      };
+      // } else if (value is GeoPoint) {
+      //   fieldValueMap[key] = {
+      //     'geoPointValue': {
+      //       'latitude': value.latitude,
+      //       'longitude': value.longitude,
+      //     },
+      //   };
+      // } else if (value is DocumentReference) {
+      //   fieldValueMap[key] = {
+      //     'referenceValue': value.path,
+      //   };
+    } else if (value is double) {
+      fieldValueMap[key] = {
+        'doubleValue': value,
+      };
+    } else if (value is int) {
+      fieldValueMap[key] = {
+        'integerValue': value.toString(),
+      };
+    } else if (value is bool) {
+      fieldValueMap[key] = {
+        'booleanValue': value,
+      };
+    } else if (value is String) {
+      fieldValueMap[key] = {
+        'stringValue': value,
+      };
+    } else if (value == null) {
+      fieldValueMap[key] = {
+        'nullValue': 'NULL_VALUE',
+      };
+    }
+
+  });
+
+  return fieldValueMap;
 }

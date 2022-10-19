@@ -10,6 +10,7 @@
 
 import 'dart:convert';
 
+import 'package:googleapis/firestore/v1.dart';
 import 'package:sample_auth_server/exceptions/exceptions.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
 import 'package:sample_auth_server/models/label.dart';
@@ -71,11 +72,15 @@ class Issue extends Payload {
           map['description'] != null ? map['description'] as String : null,
       assignedUsers: map['assignedUsers'] != null
           ? List<AuthUser>.from(
-              (map['assignedUsers'] as List<int>).map<AuthUser?>(
-                (x) => AuthUser.fromMap(x as Map<String, dynamic>),
-              ),
-            )
+              map['assignedUsers'].map((user) => AuthUser.fromMap(user)))
           : null,
+      // assignedUsers: map['assignedUsers'] != null
+      //     ? List<AuthUser>.from(
+      //         (map['assignedUsers'] as List<int>).map<AuthUser?>(
+      //           (x) => AuthUser.fromMap(x as Map<String, dynamic>),
+      //         ),
+      //       )
+      //     : null,
       label: map['label'] != null
           ? Label.fromMap(map['label'] as Map<String, dynamic>)
           : null,
@@ -249,4 +254,63 @@ class Issue extends Payload {
     }
     return issue;
   }
+
+  /// To firestore [Document]
+  ///
+  /// Note that we need to convert the [DateTime] object to a [Timestamp] object.
+
+  // Map<String, dynamic> toFirestoreFields() {
+  //   return {
+  //     'title': {'stringValue': title},
+  //     'description': {'stringValue': description},
+  //     'dueDate': {'timestampValue': dueDate?.toIso8601String()},
+  //     'label': {'mapValue': label?.toFirestoreFields()},
+  //     'creator': {'mapValue': creator?.toFirestoreFields()},
+  //     'creationDate': {'timestampValue': creationDate?.toIso8601String()},
+  //     'assignedUsers': {
+  //       'arrayValue': {
+  //         'values': assignedUsers
+  //             ?.map((e) => {'mapValue': e.toFirestoreFields()})
+  //             .toList()
+  //       }
+  //     },
+  //   };
+  // }
+
+  // Document toFirestoreDocument() {
+  //   return Document(
+  //     name: 'projects/$projectId/databases/(default)/documents/issues/$uuid',
+  //     fields: {
+  //       'title': {
+  //         'stringValue': title,
+  //       },
+  //       'description': {
+  //         'stringValue': description,
+  //       },
+  //       'dueDate': {
+  //         'timestampValue': Timestamp.fromDate(dueDate!),
+  //       },
+  //       'label': {
+  //         'mapValue': label!.toFirestoreDocument().fields,
+  //       },
+  //       'creator': {
+  //         'mapValue': creator!.toFirestoreDocument().fields,
+  //       },
+  //       'creationDate': {
+  //         'timestampValue': Timestamp.fromDate(creationDate!),
+  //       },
+  //       'assignedUsers': {
+  //         'arrayValue': {
+  //           'values': assignedUsers!.map(
+  //             (user) {
+  //               return {
+  //                 'mapValue': user.toFirestoreDocument().fields,
+  //               };
+  //             },
+  //           ).toList(),
+  //         },
+  //       },
+  //     },
+  //   );
+  // }
 }

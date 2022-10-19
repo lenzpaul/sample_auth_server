@@ -46,7 +46,9 @@ class FirebaseApiRepository {
     );
   }
 
-  // get issues endpoint
+  // GET /issues
+  //
+  // Endpoint to get all issues.
   Future<shelf.Response> getIssuesHandler(shelf.Request request) async {
     Issues issues = Issues();
 
@@ -73,13 +75,68 @@ class FirebaseApiRepository {
       }
     }
 
-    // String _issuesToJson(List<Issue> issues) {
-    //   var issuesAsJson = issues.map((issue) => issue.toJson()).toList();
-    //   return jsonEncode(issuesAsJson);
-    // }
-
     return DatabaseResponse.successfulRequest(payload: issues);
   }
+
+  /// POST /issues/{id}
+  ///
+  /// Endpoint to create a new issue.
+  Future<shelf.Response> createIssueHandler(shelf.Request request) async {
+    print(request.url.pathSegments);
+
+    final id = request.url.pathSegments.last;
+
+    // Get the issue from the request body.
+    Issue issue = await request.readAsString().then((value) {
+      Map<String, dynamic> issueMap = jsonDecode(value);
+      return Issue.fromMap(issueMap);
+    });
+
+    var issueAsFields = mapToFieldValueMap(issue.toMap());
+
+    var issueJson = issue.toMap();
+
+    // Create the document from the issue.
+
+    // Create the issue in Firestore.
+    final result = await _api.projects.databases.documents.patch(
+      Document.fromJson(issueJson),
+      '$_firestoreBaseCollectionPath/issues/$id',
+    );
+
+    // return DatabaseResponse.successfulRequest(payload: result);
+    return shelf.Response.ok(
+      JsonUtf8Encoder(' ').convert(result),
+      headers: {
+        'content-type': 'application/json',
+      },
+    );
+  }
+
+  //
+  // /// TODO: GET /issues/{id}
+  // ///
+  // /// Endpoint to get a single issue.
+  // Future<shelf.Response> getIssueHandler(shelf.Request request) async {
+  //   final issueId = request.url.pathSegments.last;
+
+  //   final result = await _api.projects.databases.documents.get(
+  //     '$_firestoreBaseCollectionPath/issues/$issueId',
+  //   );
+
+  //   if (result.fields != null) {
+  //     // This block is to convert the Document to a Map<String, dynamic> in
+  //     // JSON format, instead of a Map<String, Value>.
+  //     var docAsJson = result.toJson(); // convert to Map<String, dynamic>
+  //     var docAsString = jsonEncode(docAsJson); // convert to JSON string
+  //     var docAsMap =
+  //         jsonDecode(docAsString); // convert to Map<String, dynamic>
+
+  //     return DatabaseResponse.successfulRequest(payload: Issue.fromFirestoreDocument(docAsMap));
+  //   }
+
+  //   return DatabaseResponse.notFound();
+  // }
 
   // WIP: Finish this method
   /// Writes a new document to the Firestore database.
