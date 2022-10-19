@@ -20,11 +20,13 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 
 part 'firestore_repository.dart';
 
-/// Name of the methods to call on the [FirebaseAuthClient] class.
+/// Name of the methods to call on the [FirebaseClient] class.
 ///
 /// These map the Firebase Auth REST API methods.
+///
+/// See: https://firebase.google.com/docs/reference/rest/auth
 class FirebaseAuthAPIMethods {
-  FirebaseAuthAPIMethods._();
+  FirebaseAuthAPIMethods._(); // Prevent instantiation.
 
   static const signInAnonymously = 'signUp';
   static const signInWithPassword = 'signInWithPassword';
@@ -45,9 +47,9 @@ class FirebaseAuthAPIMethods {
 ///
 /// Routes are defined in [_setupRouter].
 /// {@endtemplate}
-class FirebaseAuthClient {
+class FirebaseClient {
   // Private constructor to prevent instantiation.
-  FirebaseAuthClient._();
+  FirebaseClient._();
 
   /// The base URL for the Firebase Auth REST API.
   static const firebaseAuthBaseUrl =
@@ -57,22 +59,29 @@ class FirebaseAuthClient {
       // 'https://function-1-k3wnvtq2fa-uc.a.run.app';
       'https://verify-id-token-k3wnvtq2fa-uc.a.run.app';
 
-  static final _instance = FirebaseAuthClient._();
+  static final _instance = FirebaseClient._();
   static get instance => _instance;
 
-  /// The authenticated client used to make requests to the Firestore API.
+  /// The authenticated client used to make authenticated requests to the
+  /// Firestore API and other Google APIs.
   late http.Client _authenticatedClient;
 
-  /// http.Client used to make requests to the Firebase Auth API.
+  /// [http.Client] used to make requests that don't require authentication.
   late http.Client _client;
 
+  /// Wrapper for the Firestore API.
+  ///
   /// Initialized in [initClient]
   late FirebaseApiRepository _firestoreRepository;
 
-  /// initialized in [initClient]
+  /// GCP project ID.
+  ///
+  /// Initialized in [initClient]
   late String _projectId;
 
-  /// initialized in [initClient]
+  /// The Router used to handle requests.
+  ///
+  /// Initialized in [initClient]
   late shelf_router.Router _router;
 
   /// Runs the server.
@@ -82,7 +91,7 @@ class FirebaseAuthClient {
     await _instance.initClient();
     try {
       await serveHandler(
-          shelf.logRequests().addHandler(FirebaseAuthClient.instance.router));
+          shelf.logRequests().addHandler(FirebaseClient.instance.router));
     } catch (e) {
       rethrow;
     }
@@ -95,7 +104,7 @@ class FirebaseAuthClient {
   shelf.Handler get routerWithLogging => shelf.logRequests().addHandler(router);
 
   static void close() {
-    FirebaseAuthClient.instance._authenticatedClient.close();
+    FirebaseClient.instance._authenticatedClient.close();
   }
 
   String get projectId => _projectId;

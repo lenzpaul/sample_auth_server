@@ -16,7 +16,7 @@ part of 'firebase_auth_client.dart';
 /// Wrapper for the Firestore API.
 class FirebaseApiRepository {
   static get _firestoreBaseCollectionPath {
-    final projectId = FirebaseAuthClient.instance.projectId;
+    final projectId = FirebaseClient.instance.projectId;
 
     return 'projects/$projectId/databases/(default)/documents';
   }
@@ -27,14 +27,14 @@ class FirebaseApiRepository {
 
   final String projectId;
 
-  final FirebaseAuthClient firebaseAuthClient;
+  final FirebaseClient firebaseAuthClient;
   final FirestoreApi _api;
 
   Future<shelf.Response> incrementHandler(shelf.Request request) async {
-    var projectId = FirebaseAuthClient.instance.projectId;
+    var projectId = FirebaseClient.instance.projectId;
 
     final result = await _api.projects.databases.documents.commit(
-      _incrementRequest(FirebaseAuthClient.instance.projectId),
+      _incrementRequest(FirebaseClient.instance.projectId),
       'projects/$projectId/databases/(default)',
     );
 

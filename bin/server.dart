@@ -9,8 +9,8 @@ main(List<String> arguments) async {
   }
 
   try {
-    await FirebaseAuthClient.run();
+    await FirebaseClient.run();
   } finally {
-    FirebaseAuthClient.close();
+    FirebaseClient.close();
   }
 }
