@@ -218,11 +218,6 @@ bool get runningInDebugMode {
 String prettyJsonEncode(Object? object) =>
     JsonEncoder.withIndent(' ').convert(object).trim();
 
-/// 'content-type': 'application/json',
-Map<String, String> get jsonContentTypeHeader => {
-      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
-    };
-
 /// Decode a JWT token and return the payload.
 Map<String, dynamic> decodeJwt(String token) {
   Map<String, dynamic> tokenMap = JwtDecoder.decode(token);

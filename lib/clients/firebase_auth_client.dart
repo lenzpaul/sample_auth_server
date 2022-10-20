@@ -8,6 +8,7 @@ import 'package:sample_auth_server/exceptions/exceptions.dart';
 import 'package:sample_auth_server/models/issue.dart';
 import 'package:sample_auth_server/models/issues.dart';
 import 'package:sample_auth_server/models/responses/responses.dart';
+import 'package:sample_auth_server/utils/headers_util.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf_router/shelf_router.dart' as shelf_router;
 import 'package:sample_auth_server/helpers.dart';
@@ -203,7 +204,16 @@ class FirebaseClient {
         isGuest: true, // Logged in anonymously
       );
 
-      response = AuthResponse.loginSuccesful(user);
+      // Add idToken to the response headers if available.
+      Map<String, Object>? headers;
+      if (body['idToken'] != null) {
+        headers = HeadersUtil.addAll([
+          HeadersUtil.bearerAuthorizationHeader(user.idToken!),
+          HeadersUtil.contentTypeJson,
+        ]);
+      }
+
+      response = AuthResponse.loginSuccesful(user, headers: headers);
     } else {
       // An error occurred.
       response = AuthResponse.failedWithFirebaseResponseBody(result.body);
@@ -289,7 +299,16 @@ class FirebaseClient {
       idToken: body['idToken'],
     );
 
-    return AuthResponse.loginSuccesful(user);
+    // Add idToken to the response headers if available.
+    Map<String, Object>? headers;
+    if (body['idToken'] != null) {
+      headers = HeadersUtil.addAll([
+        HeadersUtil.bearerAuthorizationHeader(user.idToken!),
+        HeadersUtil.contentTypeJson,
+      ]);
+    }
+
+    return AuthResponse.loginSuccesful(user, headers: headers);
   }
 
   /// Expects a POST [Request] with basic authorization with base64 encoded
@@ -885,6 +904,13 @@ class FirebaseClient {
   //     rethrow;
   //   } catch (e, st) {
   //     print('Error: $e
+
+  /// Create a Bearer token authorization header from the idToken.
+  ///
+  /// This will be returned to the client if the POST login/register handler is
+  /// called successfully.
+  // String _createBearerAuthorizationHeader(String idToken) =>
+  //     'Bearer $idToken';
 
   /// Sets up the [_router] and defines the request handlers.
   void _setupRouter() {

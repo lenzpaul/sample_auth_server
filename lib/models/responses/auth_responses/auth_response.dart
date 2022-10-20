@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, unnecessary_this
 import 'dart:convert';
 import 'package:sample_auth_server/models/models.dart';
+import 'package:sample_auth_server/utils/headers_util.dart';
 import 'package:shelf/shelf.dart' as shelf;
 
 /// A [shelf.Response] sent back to the client. It contains a
@@ -21,18 +22,23 @@ class AuthResponse extends shelf.Response {
   /// [AuthResponseBody.toMap] on.
   final AuthResponseBody body;
 
-  AuthResponse._({required this.body, int statusCode = 200})
-      : super(
+  AuthResponse._({
+    required this.body,
+    int statusCode = 200,
+    Map<String, Object>? headers,
+  }) : super(
           statusCode,
           body: body.toJson(),
-          headers: {'Content-Type': 'application/json'},
+          headers: headers ?? HeadersUtil.contentTypeJson,
           encoding: utf8,
         );
 
-  factory AuthResponse.loginSuccesful(AuthUser user) {
+  factory AuthResponse.loginSuccesful(AuthUser user,
+      {Map<String, Object>? headers}) {
     return AuthResponse._(
       body: SuccessfulLogin(userData: user),
       statusCode: 200,
+      headers: headers,
     );
   }
 
