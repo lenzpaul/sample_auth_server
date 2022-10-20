@@ -199,6 +199,7 @@ class FirebaseClient {
       var body = jsonDecode(result.body);
       var user = AuthUser(
         uuid: body['localId'],
+        idToken: body['idToken'],
         isGuest: true, // Logged in anonymously
       );
 
@@ -900,5 +901,3 @@ class FirebaseClient {
       ..get('/', getReadmeHandler);
   }
 }
-
-// issues/539cb0d1-21b6-4a3b-9a5a-6af699b4ac95
