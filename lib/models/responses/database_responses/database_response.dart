@@ -33,9 +33,11 @@ class DatabaseResponse extends shelf.Response {
           encoding: utf8,
         );
 
-  factory DatabaseResponse.successfulRequest({required Payload payload}) {
+  factory DatabaseResponse.successfulRequest(
+      {Payload? payload, String? message}) {
     return DatabaseResponse._(
       body: SuccessfulRequest(
+        message: message,
         payload: payload,
       ),
       statusCode: 200,

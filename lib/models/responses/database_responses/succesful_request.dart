@@ -7,7 +7,7 @@ import 'package:sample_auth_server/models/responses/response_body.dart';
 /// {@template successful_request}
 /// A successful database request response body.
 ///
-/// Contains a [Payload] on success of a database request.
+/// Contains an optional [Payload] on success of a database request.
 ///
 /// Format:
 /// ```json
@@ -22,12 +22,16 @@ import 'package:sample_auth_server/models/responses/response_body.dart';
 /// {@endtemplate}
 class SuccessfulRequest extends ResponseBody {
   final Payload? payload;
+  final String? message;
 
   /// {@macro successful_request}
   SuccessfulRequest({
-    String message = 'SUCCESS',
+    this.message,
     this.payload,
-  }) : super(statusCode: 200, defaultMessage: message);
+  }) : super(
+          statusCode: 200,
+          defaultMessage: message ?? 'SUCCESS',
+        );
 
   @override
   Map<String, dynamic> toMap() {

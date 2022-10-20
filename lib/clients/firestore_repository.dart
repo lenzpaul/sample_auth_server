@@ -60,8 +60,9 @@ class FirebaseApiRepository {
   ///
   /// This is the handler for the POST /issues/{id} endpoint.
   ///
-  /// It creates a new issue with the given ID.
-  Future<shelf.Response> createIssueHandler(shelf.Request request) async {
+  /// It creates a new issue with the given ID, or updates an existing issue
+  /// with the given ID if it already exists.
+  Future<shelf.Response> postIssueHandler(shelf.Request request) async {
     try {
       // The document ID is the last part of the URL path (e.g. "issues/123").
       //
@@ -93,25 +94,39 @@ class FirebaseApiRepository {
         },
       );
 
-      /// Create the issue Document in Firestore database.
-      final Document result =
-          await _api.projects.databases.documents.createDocument(
-        document,
-        '$_firestoreBaseCollectionPath',
-        'issues', // the collectionId
-        documentId: documentId,
-      );
+      // Create the issue Document in Firestore database, or update it if it
+      // already exists.
+      //
+      // Here using the `patch` method instead of `createDocument` method to allow
+      // overwriting the document if it already exists, if editing an existing
+      // issue.
+      try {
+        await _api.projects.databases.documents.patch(
+          document,
+          '$_firestoreBaseCollectionPath/issues/$documentId',
+          // currentDocument_exists: true,
+        );
+      } catch (e) {
+        throw DatabaseException(
+          message: 'Failed to update the issue in Firestore database.',
+        );
+      }
 
-      return shelf.Response.ok(
-        JsonUtf8Encoder(' ').convert(result),
-        headers: {
-          'content-type': 'application/json',
-        },
+      // final Document result =
+      //     await _api.projects.databases.documents.createDocument(
+      //   document,
+      //   '$_firestoreBaseCollectionPath',
+      //   'issues', // the collectionId
+      //   documentId: documentId,
+      // );
+
+      return DatabaseResponse.successfulRequest(
+        message: '$Issue updated successfully.',
       );
     } catch (e) {
       return DatabaseResponse.unsuccessfulRequest(
         errorMessage: e.toString(),
-        errorDescription: 'Error creating issue in Firestore database.',
+        errorDescription: 'Error updating issue in Firestore database.',
       );
     }
   }
@@ -144,36 +159,33 @@ class FirebaseApiRepository {
   // WIP: Finish this method
   /// Writes a new document to the Firestore database.
   /// The document is created with a random ID.
-  Future<shelf.Response> writeHandler(shelf.Request request) async {
-    String? collectionId = request.url.queryParameters['collectionId'];
-    if (collectionId == null) {
-      return shelf.Response(400, body: 'Missing collectionId');
-    }
-
-    Document document = Document(
-      name: '$_firestoreBaseCollectionPath/$collectionId',
-      fields: {
-        // WIP: add fields from request
-        // 'title': Value()..stringValue = 'Hello World',
-        // 'description': Value()..stringValue = 'This is a description',
-        // 'created': Value()..timestampValue = DateTime.now().toUtc(),
-      },
-    );
-
-    final result = await _api.projects.databases.documents.createDocument(
-      document,
-      // Top level base collection path
-      _firestoreBaseCollectionPath,
-      collectionId,
-    );
-
-    return shelf.Response.ok(
-      JsonUtf8Encoder(' ').convert(result),
-      headers: {
-        'content-type': 'application/json',
-      },
-    );
-  }
+  // Future<shelf.Response> writeHandler(shelf.Request request) async {
+  //   String? collectionId = request.url.queryParameters['collectionId'];
+  //   if (collectionId == null) {
+  //     return shelf.Response(400, body: 'Missing collectionId');
+  //   }
+  //   Document document = Document(
+  //     name: '$_firestoreBaseCollectionPath/$collectionId',
+  //     fields: {
+  //       // WIP: add fields from request
+  //       // 'title': Value()..stringValue = 'Hello World',
+  //       // 'description': Value()..stringValue = 'This is a description',
+  //       // 'created': Value()..timestampValue = DateTime.now().toUtc(),
+  //     },
+  //   );
+  //   final result = await _api.projects.databases.documents.createDocument(
+  //     document,
+  //     // Top level base collection path
+  //     _firestoreBaseCollectionPath,
+  //     collectionId,
+  //   );
+  //   return shelf.Response.ok(
+  //     JsonUtf8Encoder(' ').convert(result),
+  //     headers: {
+  //       'content-type': 'application/json',
+  //     },
+  //   );
+  // }
 
   // WIP: Add Try Catch error handling
   // WIP: Finish this method
@@ -186,22 +198,22 @@ class FirebaseApiRepository {
   ///   "document": "documentId"
   /// }
   ///
-  Future<shelf.Response> readDocumentHandler(shelf.Request request) async {
-    // Get the collection and document ID from the request.
-    final collectionId = request.url.queryParameters['collectionId'];
-    final documentId = request.url.queryParameters['documentId']!;
+  // Future<shelf.Response> readDocumentHandler(shelf.Request request) async {
+  //   // Get the collection and document ID from the request.
+  //   final collectionId = request.url.queryParameters['collectionId'];
+  //   final documentId = request.url.queryParameters['documentId']!;
 
-    final result = await _api.projects.databases.documents.get(
-      'projects/$projectId/databases/(default)/documents/$collectionId/$documentId',
-    );
+  //   final result = await _api.projects.databases.documents.get(
+  //     'projects/$projectId/databases/(default)/documents/$collectionId/$documentId',
+  //   );
 
-    return shelf.Response.ok(
-      prettyJsonEncode(result),
-      headers: {
-        'content-type': 'application/json',
-      },
-    );
-  }
+  //   return shelf.Response.ok(
+  //     prettyJsonEncode(result),
+  //     headers: {
+  //       'content-type': 'application/json',
+  //     },
+  //   );
+  // }
 }
 
   /// WIP

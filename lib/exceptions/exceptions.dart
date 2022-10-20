@@ -45,3 +45,18 @@ class DecodingException implements SerializationException {
 class InvalidAuthUserException extends DecodingException {
   InvalidAuthUserException({super.message, super.object});
 }
+
+class DatabaseException implements Exception {
+  final String? message;
+  final int? code;
+
+  DatabaseException({this.message, this.code});
+
+  @override
+  String toString() {
+    var error = runtimeType.toString();
+    if (message != null) error += ': $message';
+    if (code != null) error += 'Code: $code';
+    return error;
+  }
+}
