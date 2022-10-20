@@ -57,6 +57,8 @@ class FirebaseApiRepository {
   }
 
   /// POST /issues/{id}
+  /// or
+  /// PATCH /issues/{id}
   ///
   /// This is the handler for the POST /issues/{id} endpoint.
   ///
@@ -216,27 +218,27 @@ class FirebaseApiRepository {
   // }
 }
 
-  /// WIP
-  // Future firestoreQuery() async {
-  //   try {
-  //     Future<shelf.Response> incrementHandler(shelf.Request request) async {
-  //       final result = await _api.projects.databases.documents.commit(
-  //         _incrementRequest(projectId),
-  //         'projects/$projectId/databases/(default)',
-  //       );
+/// WIP
+// Future firestoreQuery() async {
+//   try {
+//     Future<shelf.Response> incrementHandler(shelf.Request request) async {
+//       final result = await _api.projects.databases.documents.commit(
+//         _incrementRequest(projectId),
+//         'projects/$projectId/databases/(default)',
+//       );
 
-  //       return shelf.Response.ok(
-  //         JsonUtf8Encoder(' ').convert(result),
-  //         headers: {
-  //           'content-type': 'application/json',
-  //         },
-  //       );
-  //     }
+//       return shelf.Response.ok(
+//         JsonUtf8Encoder(' ').convert(result),
+//         headers: {
+//           'content-type': 'application/json',
+//         },
+//       );
+//     }
 
-  //     final router = shelf_router.Router()..get('/', incrementHandler);
+//     final router = shelf_router.Router()..get('/', incrementHandler);
 
-  //     await serveHandler(router);
-  //   } finally {
-  //     firebaseAuthClient.close();
-  //   }
-  // }
+//     await serveHandler(router);
+//   } finally {
+//     firebaseAuthClient.close();
+//   }
+// }

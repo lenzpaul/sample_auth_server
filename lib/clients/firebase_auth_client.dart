@@ -893,6 +893,7 @@ class FirebaseClient {
       ..post('/signup', signUpWithEmailAndPasswordHandler)
       ..post('/updateProfile', updateProfileHandler)
       ..post('/issues/<issueId>', _firestoreRepository.postIssueHandler)
+      ..patch('/issues/<issueId>', _firestoreRepository.postIssueHandler)
       ..get('/verifyIdToken', verifyIdTokenHandler)
       ..get('/issues', _firestoreRepository.getIssuesHandler)
       ..get('/getProfile', getProfileHandler)
