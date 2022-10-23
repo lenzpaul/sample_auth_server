@@ -67,6 +67,8 @@ class ServerLogger {
 
   /// Current [ServerLogLevel] of the logger.
   ServerLogLevel _serverLogLevel = ServerLogLevel.verbose;
+  static ServerLogLevel get logLevel => instance._serverLogLevel;
+  static set logLevel(ServerLogLevel value) => instance._serverLogLevel = value;
 
   ServerLogLevel get serverLogLevel => _serverLogLevel;
 

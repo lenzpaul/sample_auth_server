@@ -3,6 +3,23 @@ import 'package:sample_auth_server/helpers.dart';
 import 'package:sample_auth_server/logger.dart';
 
 main(List<String> arguments) async {
+  // Initializing logging
+  _setupLogging();
+
+  try {
+    await FirebaseClient.run();
+  } finally {
+    FirebaseClient.close();
+  }
+}
+
+void _setupLogging() {
+  ServerLogger.logLevel = ServerLogLevel.verbose;
+
+  ServerLogger.logFilePath = 'logs/server.log';
+
+  ServerLogger.maxLogFileSize = 1000000; // 1MB
+
   // Output destination for log messages. stdout is the default.
   ServerLogger.logOutputs = [
     ServerLogOutput.file,
@@ -17,11 +34,5 @@ main(List<String> arguments) async {
     ServerLogger.log('Running in debug mode', level: ServerLogLevel.debug);
   } else {
     ServerLogger.log('Running in release mode', level: ServerLogLevel.debug);
-  }
-
-  try {
-    await FirebaseClient.run();
-  } finally {
-    FirebaseClient.close();
   }
 }
