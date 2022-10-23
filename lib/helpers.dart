@@ -11,6 +11,7 @@ import 'dart:typed_data';
 import 'package:dotenv/dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:sample_auth_server/logger.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
@@ -250,7 +251,7 @@ bool verifyJwt(String token) {
   try {
     tokenIsValid = !isJwtExpired(token);
   } catch (e) {
-    print('verifyJwt: Error: $e');
+    ServerLogger.log('verifyJwt: Error: $e', level: ServerLogLevel.error);
     tokenIsValid = false;
   }
 

@@ -14,9 +14,9 @@ main(List<String> arguments) async {
   ];
 
   if (isInDebugMode) {
-    print('Running in debug mode');
+    ServerLogger.log('Running in debug mode', level: ServerLogLevel.debug);
   } else {
-    print('Running in release mode');
+    ServerLogger.log('Running in release mode', level: ServerLogLevel.debug);
   }
 
   try {

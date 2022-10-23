@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:googleapis/firestore/v1.dart';
 import 'package:sample_auth_server/exceptions/exceptions.dart';
+import 'package:sample_auth_server/logger.dart';
 import 'package:sample_auth_server/models/auth_user.dart';
 import 'package:sample_auth_server/models/label.dart';
 import 'package:sample_auth_server/models/responses/payload.dart';
@@ -258,7 +259,7 @@ class Issue extends Payload {
         object: map,
       );
 
-      print(exception);
+      ServerLogger.log(exception.toString(), level: ServerLogLevel.error);
       throw exception;
     }
     return issue;

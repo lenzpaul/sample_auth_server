@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:sample_auth_server/exceptions/exceptions.dart';
+import 'package:sample_auth_server/logger.dart';
 import 'package:sample_auth_server/models/models.dart';
 
 /// Represents a user on the server.
@@ -136,7 +137,7 @@ class AuthUser {
         message: 'The firestore document does not have a "fields" key.',
       );
 
-      print(exception);
+      ServerLogger.log(exception.toString(), level: ServerLogLevel.error);
       throw exception;
     }
 
@@ -156,7 +157,7 @@ class AuthUser {
             'the following error: $e',
       );
 
-      print(exception);
+      ServerLogger.log(exception.toString(), level: ServerLogLevel.error);
       throw exception;
     }
     return user;

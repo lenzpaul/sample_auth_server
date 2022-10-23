@@ -428,7 +428,12 @@ class FirebaseClient {
     if (result.statusCode != 200) {
       var res = AuthResponse.signupFailedFromFirebaseResponse(result.body);
 
-      print(res.body);
+      ServerLogger.log(
+        // ignore: prefer_interpolation_to_compose_strings
+        'signUpWithEmailAndPasswordHandler'
+                'Failed to sign up user with email $email: ' +
+            res.body.toString(),
+      );
 
       // print('Sign up failed: ${res.readAsString()}');
       return res;
@@ -551,7 +556,7 @@ class FirebaseClient {
         ),
       );
     } catch (e) {
-      print(e);
+      ServerLogger.log(e.toString(), level: ServerLogLevel.error);
 
       return shelf.Response.unauthorized(
         prettyJsonEncode(

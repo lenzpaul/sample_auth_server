@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:sample_auth_server/exceptions/exceptions.dart';
+import 'package:sample_auth_server/logger.dart';
 
 class Label {
   String? uuid;
@@ -72,7 +73,7 @@ class Label {
       );
     } catch (e) {
       var exception = DecodingException(message: e.toString());
-      print(exception); // for logging remotely
+      ServerLogger.log(exception.toString(), level: ServerLogLevel.error);
       throw exception;
     }
 
