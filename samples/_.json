@@ -1,59 +1,49 @@
 {
-    "name": "projects/cmic-sample-issue-tracker/databases/(default)/documents/issues/bmCFVKoDYNzL7Y7f5hDd",
-    "fields": {
-      "assignedUsers": {
-        "arrayValue": {
-          "values": [
-            {
-              "mapValue": {
-                "fields": {
-                  "email": {
-                    "stringValue": "a@a.ca"
-                  },
-                  "isGuest": {
-                    "booleanValue": false
-                  },
-                  "username": {
-                    "stringValue": "allo"
-                  },
-                  "uid": {
-                    "stringValue": "123"
-                  },
-                  "sample_null_value": {
-                    "nullValue": null
-                  },
-                  "idToken": {
-                    "stringValue": "12345"
-                  }
-                }
-              }
-            }
-          ]
-        }
-      },
-      "title": {
-        "stringValue": "test1234"
-      },
-      "label": {
-        "mapValue": {
-          "fields": {
-            "description": {
-              "stringValue": "issues that are urgent"
-            },
-            "color": {
-              "stringValue": "EB4034"
-            },
-            "name": {
-              "stringValue": "urgent"
-            },
-            "uuid": {
-              "stringValue": "123456A"
-            }
+  "createTime": "2022-10-22T21:36:57.634004Z",
+  "fields": {
+    "title": {
+      "stringValue": "tnt"
+    },
+    "uuid": {
+      "stringValue": "a616e3e0-5251-11ed-8679-3dd0d1b54e3f"
+    },
+    "localId": {
+      "integerValue": "-9223372036854775808"
+    },
+    "creator": {
+      "mapValue": {
+        "fields": {
+          "lastName": {
+            "stringValue": ""
+          },
+          "uuid": {
+            "stringValue": "YsULE3roFleYpFd79ZeI2SX4Ws53"
+          },
+          "username": {
+            "stringValue": ""
+          },
+          "firstName": {
+            "stringValue": "null"
+          },
+          "idToken": {
+            "stringValue": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNmNjcyNDYxOTk4YjJiMzMyYWQ4MTY0ZTFiM2JlN2VkYTY4NDZiMzciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY21pYy1zYW1wbGUtaXNzdWUtdHJhY2tlciIsImF1ZCI6ImNtaWMtc2FtcGxlLWlzc3VlLXRyYWNrZXIiLCJhdXRoX3RpbWUiOjE2NjY0NzQ0ODksInVzZXJfaWQiOiJZc1VMRTNyb0ZsZVlwRmQ3OVplSTJTWDRXczUzIiwic3ViIjoiWXNVTEUzcm9GbGVZcEZkNzlaZUkyU1g0V3M1MyIsImlhdCI6MTY2NjQ3NDQ4OSwiZXhwIjoxNjY2NDc4MDg5LCJlbWFpbCI6ImFAYS5jYSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJhQGEuY2EiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.aM1ZJ781EA3O6giDTU0VB7yn61rgmg8-BVbTrVieYCeOhMOtV9Kr-0U-LHoOicIB8un58geiRMbmD71DMLjm8Dk9SeJnS_g_5v1We8PmkfzlH27YxbSRltsr-fRBUGne9v8YlYE19D-LLgOxrBd1glIfNo3iQsSOIttIbZg17rEQy6TbhP2y1GFhdSnB4b6BQtfVPyyyU7wzICwKf6EwCIjhoOu_e0WuaK-3KELcVfXBiQ897wPd2ImxzOuquUwBKAqR15y1g_z9jbkM30HD6DGt57vDmhhm-w4SDs1X6tOtlYsMmb5mpAPGwabB2KpxilJvXCLw3kvu_YTx6aJD3g"
+          },
+          "email": {
+            "stringValue": "a@a.ca"
           }
         }
       }
     },
-    "createTime": "2022-10-17T16:31:57.812426Z",
-    "updateTime": "2022-10-18T23:57:48.973581Z"
-  }
-  
+    "assignedUsers": {
+      "arrayValue": {}
+    },
+    "dueDate": {
+      "timestampValue": "2022-10-22T21:36:55.070497Z"
+    },
+    "creationDate": {
+      "timestampValue": "2022-10-22T21:36:55.070480Z"
+    }
+  },
+  "name": "projects/cmic-sample-issue-tracker/databases/(default)/documents/issues/a616e3e0-5251-11ed-8679-3dd0d1b54e3f",
+  "updateTime": "2022-10-22T21:36:57.634004Z"
+}

@@ -1,11 +1,13 @@
 import 'dart:convert';
 
-abstract class SerializationException implements Exception {}
+class ServerException implements Exception {}
+
+abstract class SerializationException extends ServerException {}
 
 /// {@template encoding_exception}
 /// Thrown when a [Map] cannot be converted to a [T] object.
 /// {@endtemplate}
-class EncodingException<T> implements SerializationException {
+class EncodingException<T> extends SerializationException {
   final String? message;
   Object? object;
 
@@ -26,7 +28,7 @@ class EncodingException<T> implements SerializationException {
 /// {@template decoding_exception}
 /// An exception thrown when decoding fails.
 /// {@endtemplate}
-class DecodingException implements SerializationException {
+class DecodingException extends SerializationException {
   final String? message;
   Object? object;
 
@@ -46,7 +48,7 @@ class InvalidAuthUserException extends DecodingException {
   InvalidAuthUserException({super.message, super.object});
 }
 
-class DatabaseException implements Exception {
+class DatabaseException extends ServerException {
   final String? message;
   final int? code;
 
