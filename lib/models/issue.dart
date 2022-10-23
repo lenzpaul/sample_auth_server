@@ -232,9 +232,9 @@ class Issue extends Payload {
               .single
               .value as Map<String, dynamic>?;
 
-      final _assignedUsers = _assignedUsersMap != null
+      final _assignedUsers = _assignedUsersMap?['values'] != null
           ? List<AuthUser>.from(
-              (_assignedUsersMap['values'] as List<dynamic>).map<AuthUser?>(
+              (_assignedUsersMap!['values'] as List<dynamic>).map<AuthUser?>(
                 (x) => AuthUser.fromFirestoreDocument(
                   x['mapValue'] as Map<String, dynamic>,
                   getIDToken: true,
