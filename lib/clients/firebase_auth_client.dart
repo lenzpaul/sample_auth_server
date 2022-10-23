@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:markdown/markdown.dart' as md;
 import 'package:sample_auth_server/exceptions/exceptions.dart';
+import 'package:sample_auth_server/logger.dart';
 import 'package:sample_auth_server/models/issue.dart';
 import 'package:sample_auth_server/models/issues.dart';
 import 'package:sample_auth_server/models/responses/responses.dart';
@@ -84,6 +85,12 @@ class FirebaseClient {
   /// Initialized in [initClient]
   late shelf_router.Router _router;
 
+  /// Logs [_router] requests.
+  static void _requestLogger(message, isError) {
+    var _level = isError ? ServerLogLevel.error : ServerLogLevel.info;
+    ServerLogger.log(message, level: _level);
+  }
+
   /// Runs the server.
   ///
   /// This is the entry point for the server.
@@ -91,7 +98,10 @@ class FirebaseClient {
     await _instance.initClient();
     try {
       await serveHandler(
-          shelf.logRequests().addHandler(FirebaseClient.instance.router));
+        shelf
+            .logRequests(logger: _requestLogger)
+            .addHandler(FirebaseClient.instance.router),
+      );
     } catch (e) {
       rethrow;
     }

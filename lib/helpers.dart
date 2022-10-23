@@ -222,7 +222,8 @@ String prettyJsonEncode(Object? object) =>
 Map<String, dynamic> decodeJwt(String token) {
   Map<String, dynamic> tokenMap = JwtDecoder.decode(token);
 
-  print('tokenMap: ${prettyJsonEncode(tokenMap)}');
+  // DEBUG
+  // print('tokenMap: ${prettyJsonEncode(tokenMap)}');
 
   return tokenMap;
 }
@@ -390,4 +391,17 @@ Map<String, dynamic> mapToFieldValueMap(Map<String, dynamic> map) {
   });
 
   return fieldValueMap;
+}
+
+/// Write String to file. If the file does not exist, it will be created.
+/// If the file exists, it will be appended to. If the file cannot be
+/// written to, an exception will be thrown.
+Future<void> writeStringToFile(String string, String path) async {
+  File file = File(path);
+
+  if (!await file.exists()) {
+    await file.create(recursive: true);
+  }
+
+  await file.writeAsString("$string\n", mode: FileMode.append);
 }

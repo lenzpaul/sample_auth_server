@@ -5,3 +5,4 @@ pubspec.lock
 .env
 bin/server
 .google_application_default_credentials.json
+logs/server.log
