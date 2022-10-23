@@ -53,7 +53,7 @@ class ServerLogger {
   static final instance = ServerLogger._();
 
   /// The [Logger] instance used to log messages to editor, console, or file.
-  static final Logger _logger = Logger(
+  final Logger _logger = Logger(
     printer: PrettyPrinter(
       methodCount: 0,
       errorMethodCount: 8,
@@ -75,8 +75,13 @@ class ServerLogger {
     Logger.level = serverLogLevel.toLoggerLevel();
   }
 
+  static int maxLogFileSize = 1000000; // 1MB
+
   /// The path to which the log file should be written.
-  String logFilePath = 'logs/server.log';
+  String _logFilePath = 'logs/server.log';
+  static set logFilePath(String value) => instance._logFilePath = value;
+  static String get logFilePath => instance._logFilePath;
+
   static set logOutputs(List<ServerLogOutput> outputs) =>
       instance._logOutputs = outputs;
 
@@ -89,11 +94,6 @@ class ServerLogger {
 
   /// The log number of the current log.
   static int _logCount = 0;
-
-  /// The output of the logger.
-  // String _formatOutput(String message) {
-  //   return '#${_logCount++}: $message';
-  // }
 
   /// Emit a log event.
   ///
@@ -126,7 +126,7 @@ class ServerLogger {
         switch (logOutput) {
           case ServerLogOutput.editorConsole:
             if (level.index >= instance._serverLogLevel.index) {
-              _logger.log(
+              instance._logger.log(
                 level.toLoggerLevel(),
                 logMessage,
                 error,
@@ -145,7 +145,7 @@ class ServerLogger {
             // Output to file
             writeStringToFile(
               logMessage,
-              '${Directory.current.path}/${instance.logFilePath}',
+              '${Directory.current.path}/$logFilePath',
             );
 
             break;

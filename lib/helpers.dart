@@ -396,10 +396,37 @@ Map<String, dynamic> mapToFieldValueMap(Map<String, dynamic> map) {
 /// Write String to file. If the file does not exist, it will be created.
 /// If the file exists, it will be appended to. If the file cannot be
 /// written to, an exception will be thrown.
-Future<void> writeStringToFile(String string, String path) async {
+///
+/// [string] The string to write to the file.
+/// [path] The path to the file to write to.
+/// [maxFileSize] The maximum file size in bytes. If the file size exceeds
+/// this value, a new file will be created and a number will be appended to
+/// the file name. For example, if the file name is 'log.txt' and the
+/// maximum file size is 1000 bytes, the first file will be named 'log.txt'
+/// and the second file will be named 'log_001.txt'. If the file size exceeds
+/// this value again, the third file will be named 'log_002.txt', and so on.
+Future<void> writeStringToFile(String string, String path,
+    {int? maxFileSize}) async {
   File file = File(path);
 
   if (!await file.exists()) {
+    await file.create(recursive: true);
+  }
+
+  // If the file size is greater than maxFileSize, then create a new file
+  // with an incremented file number.
+  if (maxFileSize != null && await file.length() > maxFileSize) {
+    int fileNumber = 0;
+    String fileNumberString = '';
+    String newFilePath = path;
+
+    while (await File(newFilePath).exists()) {
+      fileNumber++;
+      fileNumberString = fileNumber.toString().padLeft(3, '0');
+      newFilePath = path.replaceAll('.log', '_$fileNumberString.log');
+    }
+
+    file = File(newFilePath);
     await file.create(recursive: true);
   }
 
