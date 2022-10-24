@@ -936,6 +936,7 @@ class FirebaseClient {
       ..post('/updateProfile', updateProfileHandler)
       ..post('/issues/<issueId>', _firestoreRepository.postIssueHandler)
       ..patch('/issues/<issueId>', _firestoreRepository.postIssueHandler)
+      ..delete('/issues/<issueId>', _firestoreRepository.deleteIssueHandler)
       ..get('/verifyIdToken', verifyIdTokenHandler)
       ..get('/issues', _firestoreRepository.getIssuesHandler)
       ..get('/getProfile', getProfileHandler)

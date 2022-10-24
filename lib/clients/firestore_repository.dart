@@ -216,6 +216,34 @@ class FirebaseApiRepository {
   //     },
   //   );
   // }
+
+  // deleteIssueHandler
+  Future<shelf.Response> deleteIssueHandler(shelf.Request request) async {
+    try {
+      // The document ID is the last part of the URL path (e.g. "issues/123").
+      final documentId = request.url.pathSegments.last;
+
+      // Delete the issue Document in Firestore database.
+      try {
+        await _api.projects.databases.documents.delete(
+          '$_firestoreBaseCollectionPath/issues/$documentId',
+        );
+      } catch (e) {
+        throw DatabaseException(
+          message: 'Failed to delete the issue in Firestore database.',
+        );
+      }
+
+      return DatabaseResponse.successfulRequest(
+        message: '$Issue deleted successfully.',
+      );
+    } catch (e) {
+      return DatabaseResponse.unsuccessfulRequest(
+        errorMessage: e.toString(),
+        errorDescription: 'Error deleting issue in Firestore database.',
+      );
+    }
+  }
 }
 
 /// WIP
