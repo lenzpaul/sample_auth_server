@@ -37,10 +37,8 @@ class FirebaseApiRepository {
       'issues',
     );
 
-    // Convert the Firestore documents to Issues.
-    for (Document doc in result.documents!) {
-      // issues.add(Issue.fromMap(doc.fields!));
-
+    // Convert the Firestore documents to Issues, if any.
+    for (Document doc in result.documents ?? []) {
       if (doc.fields != null) {
         // This block is to convert the Document to a Map<String, dynamic> in
         // JSON format, instead of a Map<String, Value>.
@@ -56,14 +54,10 @@ class FirebaseApiRepository {
     return DatabaseResponse.successfulRequest(payload: issues);
   }
 
-  /// POST /issues/{id}
-  /// or
-  /// PATCH /issues/{id}
+  /// POST /issues/{id} or PATCH /issues/{id}
   ///
-  /// This is the handler for the POST /issues/{id} endpoint.
-  ///
-  /// It creates a new issue with the given ID, or updates an existing issue
-  /// with the given ID if it already exists.
+  /// This handler creates a new issue with the given ID, or updates an existing
+  /// issue with the given ID if it already exists.
   Future<shelf.Response> postIssueHandler(shelf.Request request) async {
     try {
       // The document ID is the last part of the URL path (e.g. "issues/123").
